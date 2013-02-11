@@ -1,0 +1,3 @@
+[submodule "power-diagram"]
+	path = power-diagram
+	url = https://github.com/ArlindNocaj/power-voronoi-diagram.git

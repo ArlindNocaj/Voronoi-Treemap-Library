@@ -356,7 +356,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		this.rootPolygon = rootPolygon;
 
 		setTree(treeStructure);
-
+		setAreaGoals(areaGoals);
+		
 		if (relativePositions == null) {
 
 			for (VoroNode voroNode : idToNode.values()) {
@@ -921,6 +922,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 
 				voroNode.setRelativeVector(new Point2D(tuple.valueX,
 						tuple.valueY));
+			} else if(tuple.id == root.getNodeID()){
+				//we do not care, we can't set a relative position for the root	
 			} else
 				throw new RuntimeException(
 						"ReferencePosition for ID without node in the tree structure.");

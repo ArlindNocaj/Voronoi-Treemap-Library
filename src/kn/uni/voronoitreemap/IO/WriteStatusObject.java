@@ -36,8 +36,7 @@ public class WriteStatusObject implements StatusObject {
 		this.filename=outputFile;
 		try {
 			writer=new BufferedWriter(new FileWriter(filename));
-		writer.write("parentID;hierarchyLevel;childID;polygonPoints x1;y2;x2;y2,...\n");
-			
+		writer.write("parentID;hierarchyLevel;childID;polygonPoints x1;y2;x2;y2,...\n");			
 		} catch (IOException e) {
 			System.out.println(e);
 		}
@@ -48,7 +47,7 @@ public class WriteStatusObject implements StatusObject {
 		writer.flush();
 		writer.close();
 		}catch(Exception e){
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		
 	}
@@ -56,26 +55,27 @@ public class WriteStatusObject implements StatusObject {
 	@Override
 	public void finishedNode(int Node, int layer, int[] children,
 			PolygonSimple[] polygons) {
-		if (children==null){
+		if (children==null)
 			return;
-		}
 		
 		for (int i=0;i<children.length;i++){
 				StringBuilder builder=new StringBuilder();
 				builder.append(Node+";"+layer+";"+children[i]);
 				PolygonSimple polygon=polygons[i];
+				if(polygon!=null){
 				double[] xPoints = polygon.getXPoints();
 				double[] yPoints = polygon.getYPoints();
-				for (int j=0;j<polygon.length;j++){
-					builder.append(";"+xPoints[j]+";"+yPoints[j]);
-				}
+				for (int j=0;j<polygon.length;j++)
+					builder.append(";"+xPoints[j]+";"+yPoints[j]);				
+				}else
+					builder.append("0;0");
 				
 				try {
 					writer.write(builder.toString()+"\n");
-				} catch (IOException e) {
-					System.out.println(e);
+				}catch (IOException e) {
+					e.printStackTrace();
 				}
-			}
+		}
 	}
 
 }

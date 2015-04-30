@@ -32,13 +32,12 @@ import kn.uni.voronoitreemap.interfaces.StatusObject;
  * 
  */
 public class VoroCPU extends Thread {
-	public static Set<VoroCPU> runningThreads = Collections
-			.newSetFromMap(new ConcurrentHashMap<VoroCPU, Boolean>());
+	public Set<VoroCPU> runningThreads;
 
-	protected static int allNodes=0;
+	protected int allNodes=0;
 	
 	
-	public static synchronized void stopThreads() {
+	public synchronized void stopThreads() {
 		for (VoroCPU v : runningThreads) {
 			v.interrupt();
 		}
@@ -47,9 +46,10 @@ public class VoroCPU extends Thread {
 	private BlockingQueue<VoroNode> cellQueue;
 	private StatusObject tellEnd;
 
-	VoroCPU(BlockingQueue<VoroNode> queue, StatusObject tellEnd) {
+	VoroCPU(BlockingQueue<VoroNode> queue, StatusObject tellEnd, Set<VoroCPU> runningThreads) {
 		this.tellEnd = tellEnd;
 		this.cellQueue = queue;
+		this.runningThreads=runningThreads;
 	}
 
 	@Override
@@ -68,8 +68,8 @@ public class VoroCPU extends Thread {
 						}
 					}
 				}
-				runningThreads.add(this);
-				voroNode.iterate();
+				runningThreads.add(this);				 
+				voroNode.iterate();				
 				tellEnd.finishedNode(voroNode.getNodeID(), voroNode.getHeight(),voroNode.getChildrenIDs(),voroNode.getChildrenPolygons());
 				ArrayList<VoroNode> children = voroNode.getChildren();
 				if (children!=null){

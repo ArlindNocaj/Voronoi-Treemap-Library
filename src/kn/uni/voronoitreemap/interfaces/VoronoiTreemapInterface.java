@@ -44,19 +44,7 @@ public interface VoronoiTreemapInterface {
 	 * 
 	 */
 	public abstract void compute();
-
-	/**
-	 * the aggressive mode modifies the weights of the sites very aggressively and is not 100% stable (some cells can get empty), anyway sometimes it yields better local minima.
-	 * @param mode
-	 */
-	public abstract void setAggressiveMode(boolean mode);
 	
-	/**
-	 * true: aggressive weight modification
-	 * false: normal weight modification
-	 * @return
-	 */
-	public abstract boolean getAggressiveMode();
 	
 	/**
 	 * Sets the seed for the random position generator which is used to initialize the sites.
@@ -175,42 +163,6 @@ public interface VoronoiTreemapInterface {
 	 */
 	public abstract int getNumberMaxIterations();
 
-	/**
-	 * If the desire of a cell (site) to increase its area is above this percentage, then this cell pushes the other cells away.
-	 * This option reduces the number of needed iteration if there is high variance in the desired cell sizes.
-	 * @param preflowPercentage
-	 */
-	public abstract void setPreflowPercentage(double preflowPercentage);
-
-	/**
-	 * {@link #setPreflowPercentage(double)}
-	 * @return
-	 */
-	public abstract double getPreflowPercentage();
-
-	/**
-	 * @param preflowIncrease
-	 *            the preflowIncrease to set
-	 */
-	public abstract void setPreflowIncrease(double preflowIncrease);
-
-	/**
-	 * @return the preflowIncrease
-	 */
-	public abstract double getPreflowIncrease();
-
-	/**
-	 * Activates the speed up heuristic which uses some kind of force to make more space for big cells.
-	 * @param useExtrapolation
-	 *            the useExtrapolation to set
-	 */
-	public abstract void setUseExtrapolation(boolean useExtrapolation);
-
-	/**
-	 * {@link #setUseExtrapolation(boolean)}
-	 * @return the useExtrapolation
-	 */
-	public abstract boolean getUseExtrapolation();
 
 	/**
 	 * true: the optimization process is canceled when the area error is below the given threshold.
@@ -225,11 +177,6 @@ public interface VoronoiTreemapInterface {
 	 */
 	public abstract boolean getCancelOnThreshold();
 	
-	/**
-	 * maximal error threshold to cancel the optimization process.
-	 * @return
-	 */
-	public abstract double getCancelErrorThreshold();
 
 	/**
 	 * true: The optimization process is canceled when the maximal iteration number is reached.
@@ -271,20 +218,8 @@ public interface VoronoiTreemapInterface {
 	 */
 	public abstract PolygonSimple getRootPolygon();
 
-	/**
-	 * true: guarantees that the weight adaption does not cause empty cells.
-	 * false:computation is approx. 30 % faster, but exception could be thrown in the optimization process 
-	 * @param guaranteeInvariant
-	 *            guarantee non empty cells
-	 */
-	public abstract void setGuaranteeValidCells(boolean guaranteeInvariant);
-
-	/**
-	 * {@link #setGuaranteeValidCells(boolean)}
-	 * @return the guaranteeInvariant
-	 */
-	public abstract boolean getGuaranteeValidCells();
-
+	
+	
 	/**
 	 * If possible the given number of threads will be started to speed up the optimization process. 
 	 * Usually this is possible after the computation of the first hierarchy level has been finished.
@@ -306,21 +241,12 @@ public interface VoronoiTreemapInterface {
 	 */
 	public abstract StatusObject getStatusObject();
 	
-	/**
-	 * Return whether negative weights for the sites are allowed. Negative weights should result in a faster convergence.
-	 * @return
-	 */
-	public abstract boolean isUseNegativeWeights();
-	
-	
-	/**
-	 * set usage of negative weights for the sites.  Negative weights should result in a faster convergence.
-	 * @param use
-	 */
-	public abstract void setUseNegativeWeights(boolean use);
 	
 	/**
 	 * Clears the used datastructures.
 	 */
 	public abstract void clear();
+
+
+	public abstract void setErrorAreaThreshold(double d);
 }

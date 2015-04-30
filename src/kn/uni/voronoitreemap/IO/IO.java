@@ -14,11 +14,18 @@ package kn.uni.voronoitreemap.IO;
 
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import kn.uni.voronoitreemap.interfaces.data.TreeData;
 import kn.uni.voronoitreemap.interfaces.data.Tuple2ID;
 import kn.uni.voronoitreemap.interfaces.data.Tuple3ID;
+import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
 
 
 public class IO {
@@ -32,18 +39,10 @@ public class IO {
 	public static ArrayList<Tuple2ID> readWeights(String filename) throws Exception{
 		
 		try{
-			BufferedReader reader =new BufferedReader(new FileReader(filename));
-			int n=0;
-			String line="";
+			BufferedReader reader;
 			
-			while (reader.ready()){
-				line=reader.readLine();
-				if (line==null) break;
-				if (!(line.startsWith("*"))){
-					n++;	
-				}
-			}
-			reader.close();
+			String line;
+			int n = countLines(filename);
 			
 			ArrayList<Tuple2ID> data=new ArrayList<Tuple2ID>(n);
 			reader=new BufferedReader(new FileReader(filename));
@@ -82,18 +81,10 @@ public class IO {
 public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exception{
 		
 		try{
-			BufferedReader reader =new BufferedReader(new FileReader(filename));
-			int n=0;
-			String line="";
+			BufferedReader reader;
 			
-			while (reader.ready()){
-				line=reader.readLine();
-				if (line==null) break;
-				if (!(line.startsWith("*"))){
-					n++;	
-				}
-			}
-			reader.close();
+			String line;
+			int n = countLines(filename);
 			
 			ArrayList<Tuple3ID> data=new ArrayList<Tuple3ID>(n);
 			reader=new BufferedReader(new FileReader(filename));
@@ -137,18 +128,9 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 	 */
 	public static ArrayList<ArrayList<Integer>> readTree(String filename) throws Exception {
 		try{
-			BufferedReader reader =new BufferedReader(new FileReader(filename));
-			int n=0;
-			String line="";
-			
-			while (reader.ready()){
-				line=reader.readLine();
-				if (line==null) break;
-				if (!(line.startsWith("*"))){
-					n++;	
-				}
-			}
-			reader.close();
+			BufferedReader reader;
+			String line;
+			int n = countLines(filename);
 			
 			ArrayList<ArrayList<Integer>> data=new ArrayList<ArrayList<Integer>>(n);
 			reader=new BufferedReader(new FileReader(filename));
@@ -176,4 +158,135 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 		}
 		
 	}
+
+	private static int countLines(String filename)
+			throws FileNotFoundException, IOException {
+		BufferedReader reader =new BufferedReader(new FileReader(filename));
+		int n=0;
+		String line="";
+		
+		while (reader.ready()){
+			line=reader.readLine();
+			if (line==null) break;
+			if (!(line.startsWith("*"))){
+				n++;	
+			}
+		}
+		reader.close();
+		return n;
+	}
+	
+	
+	public static void main(String[] args){
+		String file="OctagonLinkedList.txt";
+		try {
+			readEdgeList(file);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public static TreeData readEdgeList(String filename) throws Exception {
+			int numLines=countLines(filename);
+			ArrayList<ArrayList<Integer>> treeAdj=new ArrayList<>(numLines);
+			ArrayList<Tuple2ID> weights=new ArrayList<Tuple2ID>(numLines);
+			
+
+			BufferedReader reader= new BufferedReader(new FileReader(filename));						
+			
+			
+			HashMap<String, Integer> nameToId=new HashMap<String, Integer>(numLines);
+			HashMap<Integer, String[]> nodeEntry=new HashMap<Integer, String[]>(numLines);
+			HashMap<Integer,Integer> parent=new HashMap<Integer, Integer>();
+			
+			String firstLine= reader.readLine();
+			String[] columnHeader = firstLine.split(";");
+//			int numCol=columnHeader.length;
+			
+			String weightCol="weight";
+			
+			String line;
+			int id=0;
+			Set<Integer> childSet=new HashSet<Integer>();
+			while(reader.ready()){
+				line=reader.readLine();
+				if (line==null) break;
+				if (line.startsWith("*")) continue;
+				if (line.startsWith("#")) continue;
+	
+				String[] strings = line.split(";");
+				String nodeName=strings[0];
+				String parentName=strings[1];
+				if(parentName.equals("-1")){
+					System.out.println("sss");
+				}
+
+				Integer nodeId=nameToId.get(nodeName);				
+				if(nodeId==null){
+					nodeId=id++;
+					nameToId.put(nodeName, nodeId);
+					ArrayList<Integer> adj = new ArrayList<Integer>();
+					adj.add(nodeId);
+					treeAdj.add(adj);
+					
+					
+				}
+				Integer parentId = nameToId.get(parentName);
+				if(parentId==null){
+					parentId=id++;
+					nameToId.put(parentName, parentId);
+					ArrayList<Integer> adj = new ArrayList<Integer>();
+					adj.add(parentId);
+					treeAdj.add(adj);
+				}
+				
+				childSet.add(nodeId);
+									
+				treeAdj.get(parentId).add(nodeId);
+				parent.put(nodeId, parentId);
+				nodeEntry.put(nodeId, strings);
+				
+			}
+			reader.close();
+			
+			int weightIndex=-1;
+			for (int i = 0; i < columnHeader.length; i++) 
+				if(columnHeader[i].equals(weightCol))
+					weightIndex=i;
+			
+			for(Integer key:nodeEntry.keySet()){
+				String[] strings=nodeEntry.get(key);
+				double weight=1.0;
+				if(weightIndex>=0){
+				String w = strings[weightIndex];
+				weight=Double.parseDouble(w);
+				}
+				weights.add(new Tuple2ID(key, weight));				
+			}
+			
+			Integer root=0;
+			
+			while(parent.get(root)!=null){
+				root=parent.get(root);
+			}
+			
+			for(Integer key:nameToId.values()){
+				if(!childSet.contains(key)){
+					
+					System.out.println("root: "+key);
+					System.out.println(nameToId.get(""));
+				}
+			}
+			
+			System.out.println("Read nodes: # "+weights.size());
+			
+			TreeData data=new TreeData();
+			data.tree=treeAdj;
+			data.weights=weights;
+			
+			data.rootIndex=root;
+			return data;
+	}
+
 }

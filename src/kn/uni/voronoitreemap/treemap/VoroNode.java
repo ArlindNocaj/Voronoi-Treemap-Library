@@ -14,10 +14,13 @@ package kn.uni.voronoitreemap.treemap;
 
 
 import java.awt.Rectangle;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 
+import kn.uni.voronoitreemap.core.VoroSettings;
 import kn.uni.voronoitreemap.core.VoronoiCore;
 import kn.uni.voronoitreemap.extension.VoroCellObject;
 import kn.uni.voronoitreemap.j2d.Point2D;
@@ -74,10 +77,52 @@ public class VoroNode implements VoroCellObject {
 		}
 
 		for (VoroNode child : children) {
-			child.setWantedPercentage(child.getWeight() / sum);
+			child.setWantedPercentage(child.getWeight() / sum);			
 		}
 		this.weight = sum;
 
+	}
+	
+	public void setSpiralRelativeCoordinates(){		
+		if (children == null || children.size() == 0) {
+			return;
+		}
+		
+		
+		
+		ArrayList<VoroNode> nodes=children;
+		
+		Collections.sort(nodes,new Comparator<VoroNode>() {
+			@Override
+			public int compare(VoroNode o1, VoroNode o2) {
+				
+				// TODO Auto-generated method stub
+				return -Double.compare(o1.getWantedPercentage(),o2.getWantedPercentage());
+				
+			}
+
+		});
+	
+		
+		int i=0;
+		Random rand=new Random();
+		for (VoroNode voroNode : nodes) {
+			double angle=Math.PI*2.0*(i*1.0/nodes.size());
+			double b=1;
+			double a=1;
+//			double radius=b*Math.exp(a*angle);
+			double radius=1-i*1.0/nodes.size()+(rand.nextFloat()-0.5)*0.2;
+			double x =Math.cos(angle);
+			double y =Math.sin(angle);
+			x*=radius;
+			y*=radius;
+			voroNode.setRelativeVector(new Point2D(x, y));
+			i++;
+		}
+		
+		for (VoroNode child : children) 
+			child.setSpiralRelativeCoordinates();
+		
 	}
 
 //	@Override
@@ -170,11 +215,21 @@ public class VoroNode implements VoroCellObject {
 	}
 
 	public void iterate() {
+		
+		
+		
 //		System.out.println("VoroNode begin Iteration Node: " + getNodeID()+ " Layer: " + getHeight() + "  " + Arrays.toString(getChildrenIDs()));
 		if (children == null || children.size() == 0)
 			return;
 		if (site != null)
 			polygon=this.site.getPolygon();
+		
+		for(VoroNode child:children){
+			if(child.getNodeID()==27802){
+				System.out.println("here");
+			}
+		}
+		
 		scaleRelativeVectors();
 		if (this.core == null) {
 			core = new VoronoiCore(this.polygon);
@@ -244,11 +299,18 @@ public class VoroNode implements VoroCellObject {
 	public void scaleRelativeVectors() {
 		if (getChildren() == null)
 			return;
-		if (getChildren().size() == 1) {
-			VoroNode child = getChildren().get(0);
+		
+		if(polygon==null && getParent().getChildren().size()==1){
+			//clone from daddy
+			polygon=getParent().getPolygon().clone();
+		}
+		
+		if (getChildren().size() == 1) {			
+			VoroNode child = getChildren().get(0);			
 			child.setRelativeVector(polygon.getInnerPoint());
 			return;
 		}
+		
 		Rectangle bounds = polygon.getBounds();
 
 		double minX = Double.MAX_VALUE;
@@ -297,17 +359,13 @@ public class VoroNode implements VoroCellObject {
 	}
 
 	private void setSettingsToCore(){
-		core.setPreflowPercentage(treemap.getPreflowPercentage());
-		core.setPreflowIncrease(treemap.getPreflowIncrease());
-		core.setUseExtrapolation(treemap.getUseExtrapolation());
-		core.setCancelOnAreaErrorThreshold(treemap.getCancelOnThreshold());
-		core.setErrorAreaThreshold(treemap.getCancelErrorThreshold());
-		core.setCancelOnMaxIterat(treemap.getCancelOnMaxIteration());
-		core.setGuaranteeValidCells(treemap.getGuaranteeValidCells());
-		core.setNumberMaxIterations(treemap.getNumberMaxIterations());
-		core.setUseNegativeWeights(treemap.isUseNegativeWeights());
-		core.setAggressiveMode(treemap.getAggressiveMode());
-		
+		core.setLevel(height);		
+//		if(this.height<=1){
+//			VoroSettings copy = treemap.coreSettings.clone();
+//			copy.errorThreshold*=0.01;
+//			core.setSettings(copy);
+//		}else
+		core.setSettings(treemap.coreSettings);								
 	}
 	
 	public void increasePercentageDirectly() {

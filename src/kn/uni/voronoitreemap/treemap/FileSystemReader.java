@@ -62,10 +62,9 @@ public class FileSystemReader {
 	
 	
 	public static void main(String args[]){
-	
-		FileSystemReader reader=new FileSystemReader("/home/nocaj/Desktop", "example3.txt");
-		reader.createTreeFile();
 		
+		FileSystemReader reader=new FileSystemReader("/home/nocaj/Documents", "documents.txt");
+		reader.createTreeFile();
 		
 	}
 

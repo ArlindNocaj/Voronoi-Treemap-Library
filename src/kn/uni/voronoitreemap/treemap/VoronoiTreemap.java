@@ -14,19 +14,25 @@ package kn.uni.voronoitreemap.treemap;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 import javax.swing.JLayeredPane;
 
+import kn.uni.voronoitreemap.core.VoroSettings;
 import kn.uni.voronoitreemap.core.VoronoiCore;
 import kn.uni.voronoitreemap.debug.ImageFrame;
 import kn.uni.voronoitreemap.gui.JPolygon;
@@ -62,6 +68,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	private boolean initialized = false;
 
 	private boolean useBorder = false;
+	
 	private double shrinkPercentage = 1;
 	private boolean showLeafs = false;
 
@@ -76,60 +83,37 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	long timeStart;
 	long timeEnd;
 	private Semaphore lock = new Semaphore(1);
-
-	/**
-	 * Settings for the Core
-	 */
-	private int numberMaxIterations = 200;
-	/**
-	 * A site which wants to reach more then preflowPercentage is considered for
-	 * preflow extrapolation. default value: 0.08
-	 */
-	private double preflowPercentage = 0.08;
-	/**
-	 * If a region wants to increase its area by the factor preflowIncrease it
-	 * is considered for preflow extrapolation default value is 1.5 or 1.6
-	 */
-	private double preflowIncrease = 1.3;
-	private boolean useNegativeWeights = true;
-	private boolean useExtrapolation = false;
-	private boolean cancelOnThreshold = false;
-	private boolean cancelOnMaxIterat = true;
-	protected double errorAreaThreshold = 0.001;
-	protected boolean preflowFinished = false;
-	private boolean guaranteeValidCells = false;
-
-	
-	private boolean aggressiveMode=false;
 	
 	/**
-	 * This queue handles the voronoi cells which have to be calculated
+	 * This queue handles the voronoi cells which have to be calculated.
 	 */
 	BlockingQueue<VoroNode> cellQueue = new LinkedBlockingQueue<VoroNode>();
-	private int[] levelsMaxIteration;
-	private StatusObject statusObject;
+	private List<StatusObject> statusObject;
 
-	/**
-	 * used for, e.g., random positioning of points
-	 */
-	long randomSeed=1985;
+	// used for randomization
+	long randomSeed=21;
 	Random rand = new Random(randomSeed);
-	private HashMap<Integer, VoroNode> idToNode;
+	
+	private HashMap<Integer, VoroNode> idToNode;	
+	private ArrayList<Tuple3ID> relativePositions;
+	
+	VoroSettings coreSettings=new VoroSettings();
+	private int[] levelsMaxIteration;
+	private Set<VoroCPU> runningThreads;
+	private int rootIndex;
 
 	/** when a node is finished the status object is notified. **/
 
 	public VoronoiTreemap(StatusObject statusObject) {
 		this();
-		this.statusObject = statusObject;
+		this.statusObject.add(statusObject);
 	}
 
 	public VoronoiTreemap(StatusObject statusObject, boolean multiThreaded) {
-		this();
-		this.statusObject = statusObject;
-
-		if (multiThreaded) {
-			setNumberThreads(Runtime.getRuntime().availableProcessors());
-		}
+		this(statusObject);
+		
+		if (multiThreaded) 
+			setNumberThreads(Runtime.getRuntime().availableProcessors());		
 	}
 
 	public VoronoiTreemap() {
@@ -139,7 +123,6 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	protected void recalculatePercentage() {
 		amountAllNodes = 0;
 		alreadyDoneNodes = 0;
-
 		root.calculateWeights();
 	}
 
@@ -154,38 +137,20 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	}
 
 	protected void init() {
-
 		initialized = false;
-
 		useBorder = false;
 		shrinkPercentage = 1;
-		showLeafs = false;
-		
+		showLeafs = false;		
 		numberThreads = 1;
 		root = null;
 		rootPolygon = null;
-
-		numberMaxIterations = 200;
-		preflowPercentage = 0.08;
-
-		preflowIncrease = 1.3;
-		useNegativeWeights = true;
-		useExtrapolation = false;
-		cancelOnThreshold = false;
-		cancelOnMaxIterat = true;
-		errorAreaThreshold = 0.001;
-		preflowFinished = false;
-		guaranteeValidCells = false;
-
 		if (cellQueue!=null)
 			cellQueue.clear();
-
-		statusObject = null;
-		rand = new Random(1985);
+		statusObject = new ArrayList<StatusObject>();
+		rand = new Random(randomSeed);
 		if (idToNode!=null)
 			idToNode.clear();
 		lock = new Semaphore(1);
-
 	}
 
 	protected void initVoroNodes() {
@@ -193,15 +158,15 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 			initialized = true;
 			cellQueue.clear();
 			root.calculateWeights();
+			setRelativePositions(relativePositions);
 		}
 	}
 
-	private void startComputeThreads() {
-		// start as much VoroCPUs as there are CPUS available
-		//System.out.println("numberThreads:" + getNumberThreads());
-		for (int i = 0; i < getNumberThreads(); i++) {
-			new VoroCPU(cellQueue, this).start();
-		}
+	private void startComputeThreads() { 
+		this.runningThreads = Collections
+				.newSetFromMap(new ConcurrentHashMap<VoroCPU, Boolean>());
+		for (int i = 0; i < getNumberThreads(); i++) 
+			new VoroCPU(cellQueue, this,runningThreads).start();		
 	}
 
 	/*
@@ -236,45 +201,6 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	protected void setSettingsToVoroNode(VoroNode node) {
 		node.setTreemap(this);
 	}
-
-	/**
-	 * Generate ExamplePicture
-	 * 
-	 * @param args
-	 */
-	// public static void main(String[] args) {
-	// VoronoiCore.setDebugMode();
-	// VoronoiTreemap voronoiTreemap = new VoronoiTreemap(null);
-	// voronoiTreemap.setUpToLastLeaf(true);
-	// voronoiTreemap.setUseBorder(false);
-	// voronoiTreemap.setShrinkPercentage(0.96);
-	//
-	// NPoly rootPolygon = new NPoly();
-	// int width=200;
-	// int height=400;
-	// rootPolygon.add(0, 0);
-	// rootPolygon.add(width, 0);
-	// rootPolygon.add(width, height);
-	// rootPolygon.add(0, height);
-	//
-	// /**
-	// * Create the hierarchy
-	// */
-	//
-	//
-	//
-	// VoroNode r = getSmallTreemapExample(voronoiTreemap, rootPolygon);
-	//
-	// /**
-	// // * ImageFrame
-	// // */
-	// BufferedImage image = new BufferedImage(8000, 8000,
-	// BufferedImage.TYPE_INT_RGB);
-	//
-	// Graphics2D graphic = image.createGraphics();
-	// voronoiTreemap.setGraphics(graphic);
-	// voronoiTreemap.iterate();
-	// }
 
 	public static void main(String[] args) {
 		VoronoiCore.setDebugMode();
@@ -343,6 +269,11 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		voronoiTreemap.compute();
 	}
 
+	
+	public void setRootIndex(int rootIndex) {
+		this.rootIndex = rootIndex;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -357,9 +288,15 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 
 		setTree(treeStructure);
 		setAreaGoals(areaGoals);
-		
-		if (relativePositions == null) {
+		this.relativePositions=relativePositions;
+		root.setVoroPolygon(rootPolygon);
 
+	}
+
+	private void setRelativePositions(ArrayList<Tuple3ID> relativePositions) {
+		if (relativePositions == null) {			
+//		root.setSpiralRelativeCoordinates();	
+			
 			for (VoroNode voroNode : idToNode.values()) {
 				double x = rand.nextDouble();
 				double y = rand.nextDouble();
@@ -368,9 +305,6 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		} else {
 			setReferenceMap(relativePositions);
 		}
-
-		root.setVoroPolygon(rootPolygon);
-
 	}
 
 	protected final VoroNode createVoroNode(
@@ -560,7 +494,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		// }
 		// }
 		
-		if (statusObject != null)
+		for(StatusObject statusObject:this.statusObject)
 			statusObject.finished();
 		lock.release();
 
@@ -675,7 +609,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 * @see treemap.voronoiTreemapInterface#setNumberMaxIterations(int)
 	 */
 	public void setNumberMaxIterations(int numberMaxIterations) {
-		this.numberMaxIterations = numberMaxIterations;
+		coreSettings.maxIterat = numberMaxIterations;
 	}
 
 	/*
@@ -684,61 +618,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 * @see treemap.voronoiTreemapInterface#getNumberMaxIterations()
 	 */
 	public int getNumberMaxIterations() {
-		return numberMaxIterations;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#setPreflowPercentage(double)
-	 */
-	public void setPreflowPercentage(double preflowPercentage) {
-		this.preflowPercentage = preflowPercentage;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#getPreflowPercentage()
-	 */
-	public double getPreflowPercentage() {
-		return preflowPercentage;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#setPreflowIncrease(double)
-	 */
-	public void setPreflowIncrease(double preflowIncrease) {
-		this.preflowIncrease = preflowIncrease;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#getPreflowIncrease()
-	 */
-	public double getPreflowIncrease() {
-		return preflowIncrease;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#setUseExtrapolation(boolean)
-	 */
-	public void setUseExtrapolation(boolean useExtrapolation) {
-		this.useExtrapolation = useExtrapolation;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#getUseExtrapolation()
-	 */
-	public boolean getUseExtrapolation() {
-		return useExtrapolation;
+		return coreSettings.maxIterat;
 	}
 
 	/*
@@ -747,7 +627,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 * @see treemap.voronoiTreemapInterface#setCancelOnThreshold(boolean)
 	 */
 	public void setCancelOnThreshold(boolean cancelOnThreshold) {
-		this.cancelOnThreshold = cancelOnThreshold;
+		this.coreSettings.cancelAreaError= cancelOnThreshold;
 	}
 
 	/*
@@ -756,7 +636,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 * @see treemap.voronoiTreemapInterface#getCancelOnThreshold()
 	 */
 	public boolean getCancelOnThreshold() {
-		return cancelOnThreshold;
+		return coreSettings.cancelAreaError;
 	}
 
 	/*
@@ -765,7 +645,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 * @see treemap.voronoiTreemapInterface#setCancelOnMaxIteration(boolean)
 	 */
 	public void setCancelOnMaxIteration(boolean cancelOnMaxIterat) {
-		this.cancelOnMaxIterat = cancelOnMaxIterat;
+		coreSettings.cancelMaxIterat = cancelOnMaxIterat;
 	}
 
 	/*
@@ -774,7 +654,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 * @see treemap.voronoiTreemapInterface#getCancelOnMaxIteration()
 	 */
 	public boolean getCancelOnMaxIteration() {
-		return cancelOnMaxIterat;
+		return coreSettings.cancelMaxIterat;
 	}
 
 	/*
@@ -819,23 +699,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		return rootPolygon;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#setGuaranteeValidCells(boolean)
-	 */
-	public void setGuaranteeValidCells(boolean guaranteeInvariant) {
-		this.guaranteeValidCells = guaranteeInvariant;
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#getGuaranteeValidCells()
-	 */
-	public boolean getGuaranteeValidCells() {
-		return guaranteeValidCells;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -866,7 +730,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 * )
 	 */
 	public void setStatusObject(StatusObject statusObject) {
-		this.statusObject = statusObject;
+		this.statusObject.add(statusObject);
 	}
 
 	/*
@@ -875,7 +739,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 * @see treemap.voronoiTreemapInterface#getStatusObject()
 	 */
 	public StatusObject getStatusObject() {
-		return statusObject;
+		return statusObject.get(0);
 	}
 
 	/*
@@ -887,7 +751,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	@Override
 	public void finishedNode(int Node, int layer, int[] children,
 			PolygonSimple[] polygons) {
-		if (statusObject != null)
+		for(StatusObject statusObject:this.statusObject)			
 			statusObject.finishedNode(Node, layer, children, polygons);
 	}
 
@@ -934,8 +798,9 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	public void setTree(ArrayList<ArrayList<Integer>> treeStructure) {
 		idToNode = new HashMap<Integer, VoroNode>();
 
-		ArrayList<Integer> line = treeStructure.get(0);
+		ArrayList<Integer> line = treeStructure.get(rootIndex);
 		int numberLines = treeStructure.size();
+		
 		root = createVoroNode(idToNode, line);
 
 		for (int i = 1; i < numberLines; i++) {
@@ -950,33 +815,12 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 
 		root.setVoroPolygon(rootPolygon);
 	}
-
-	@Override
-	public boolean isUseNegativeWeights() {
-		return useNegativeWeights;
-	}
-
-	@Override
-	public void setUseNegativeWeights(boolean use) {
-		useNegativeWeights = use;
-	}
-
 	@Override
 	public void clear() {
 		init();
 	}
 
-	@Override
-	public void setAggressiveMode(boolean mode) {
-		aggressiveMode=mode;
-	}
-
-	@Override
-	public boolean getAggressiveMode() {
-	return aggressiveMode;
-	}
-
-	@Override
+		@Override
 	public void setRandomSeed(long seed) {
 		randomSeed=seed;
 		rand.setSeed(seed);
@@ -988,8 +832,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	}
 
 	@Override
-	public double getCancelErrorThreshold() {
-		return errorAreaThreshold;
-	}
-
+	public void setErrorAreaThreshold(double d) {
+		coreSettings.errorThreshold=d;
+		
+	}	
 }

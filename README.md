@@ -2,7 +2,7 @@ Java Voronoi Treemap Library
 =====================
 
 *Voronoi Treemap Library* is a fast standalone java library which computes Voronoi Treemaps.
-
+--
 The following article contains most important references related to this implementation.
 
 

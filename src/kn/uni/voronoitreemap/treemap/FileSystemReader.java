@@ -18,64 +18,72 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Reader to extract a hierarchy out of a given entrypoint in the filesystem. This hierarchy could then e.g. visualized as a Voronoi Treemap where the area corresponds to the file/folder size.
+ * Reader to extract a hierarchy out of a given entrypoint in the filesystem.
+ * This hierarchy could then e.g. visualized as a Voronoi Treemap where the area
+ * corresponds to the file/folder size.
+ * 
  * @author Arlind Nocaj
  *
  */
 public class FileSystemReader {
-	Integer nodeID=1;
+	Integer nodeCount = 0;
 	private String exportFile;
 	private String directory;
 	private BufferedWriter writer;
-	public FileSystemReader(String directory, String exportFile){
-		this.directory=directory;
-		this.exportFile=exportFile;
+
+	public FileSystemReader(String directory) {
+		this.directory = directory;
+		this.exportFile = "VT-" + new File(directory).getName() + ".txt";
 	}
-	
-	public void listDir(File dir, int myID) throws IOException {
 
+	public void listDir(File dir, int parentId) throws IOException {
+		System.out.println(dir.getName()+"\t"+parentId);
 		File[] files = dir.listFiles();
-			if (files==null || files.length<1) return;
-		int startID=nodeID;
-		writer.write(new Integer(myID).toString());
-		
-			for (int i = 0; i < files.length; i++) {
-//				System.out.println(";"+nodeID);
-				
-				writer.write(";"+nodeID);
-				nodeID++;
-			}
-			writer.write("\n");
-			for (int i=0;i<files.length;i++){
-				if (files[i].isDirectory()) {
-//					System.out.print(" (Ordner)\n");
-					listDir(files[i],startID+i+1); // ruft sich selbst mit dem 
-						// Unterverzeichnis als Parameter auf
-					}
-				else {
-					
-//					System.out.print(" (Datei)\n");
-				}
-
-			}
+		if (files == null || files.length < 1)
+			return;
+		for (File f : files) {
+			if(!f.exists()) continue;
+			int nodeId = ++nodeCount;
+			String line = getLine(f, nodeId, parentId);
+			writer.write(line + "\n");
+			if (f.isDirectory())
+				listDir(f, nodeId);
 		}
-	
-	
-	public static void main(String args[]){
-		
-		FileSystemReader reader=new FileSystemReader("/home/nocaj/Documents", "documents.txt");
+	}
+
+	public static void main(String args[]) {
+System.out.println("here");
+		FileSystemReader reader = new FileSystemReader("/Users/nocaj/Documents/workspace/visone2");
 		reader.createTreeFile();
+
+	}
+
+	public String getLine(File file, int nodeId, int parentId) {
+		if (!file.exists())
+			return null;
+		// "nodeId,parrentId,name,size,createdDate,modifiedDate";
+		long length = 0;
+		if (file.isFile())
+			length = file.length();
+		String line = nodeId + ";" + parentId + ";" + file.getName().replace(";", "") + ";"
+				+ length;
 		
+		return line;
 	}
 
 	private void createTreeFile() {
 		try {
+			File expFile=new File(exportFile);
+			if(expFile.exists()) expFile.delete();
 			
-			this.writer=new BufferedWriter(new FileWriter(exportFile));
-			listDir(new File(directory), 0);
-		writer.flush();
-		writer.close();
-		
+			this.writer = new BufferedWriter(new FileWriter(exportFile));
+			String header="nodeI;parentId;name;weight";
+			writer.write(header+"\n");
+			nodeCount = 0;
+			listDir(new File(directory), nodeCount);
+			writer.flush();
+			writer.close();
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

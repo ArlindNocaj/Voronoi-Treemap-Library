@@ -132,7 +132,7 @@ public class MainClass {
 		    					rootPolygon.add(x,y);
 							}
 		
-//		    			VoronoiCore.setDebugMode();	
+		    			VoronoiCore.setDebugMode();	
 		    				
 //		    				rootPolygon.add(0, 0);
 //		    				rootPolygon.add(width, 0);
@@ -144,11 +144,11 @@ public class MainClass {
 		    		    ((VoronoiTreemap)treemap).setRootIndex(treeData.rootIndex);
 		    			treemap.setTreeAndWeights(rootPolygon, treeData.tree, null, null);		    					    			
 		    			treemap.setCancelOnMaxIteration(true);
-		    			treemap.setNumberThreads(8);
+		    			treemap.setNumberThreads(1);
 		    			treemap.setCancelOnThreshold(true);
 		    			treemap.setNumberMaxIterations(3000);
 		    			treemap.setErrorAreaThreshold(0.05);
-		    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt")));
+//		    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt")));
 		    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), treemap));
 		    			treemap.computeLocked();
 		    			

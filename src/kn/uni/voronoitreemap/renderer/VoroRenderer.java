@@ -119,7 +119,7 @@ public class VoroRenderer {
 			}
 			Color fillColor=Colors.getColors().get(Math.min(child.getHeight(),Colors.getColors().size()-1));
 			g.setColor(fillColor);
-			g.drawPolygon(poly.getXpointsClosed(), poly.getYpointsClosed(), poly.length+1);			
+//			g.drawPolygon(poly.getXpointsClosed(), poly.getYpointsClosed(), poly.length+1);			
 		}
 		
 //		for(VoroNode child:nodeList){			

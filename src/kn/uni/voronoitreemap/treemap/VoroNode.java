@@ -58,6 +58,7 @@ public class VoroNode implements VoroCellObject {
 	
 	public VoroNode(int nodeID) {
 		this.nodeID = nodeID;
+		relativeVector=new Point2D();
 	}
 	
 	public VoroNode(int nodeID, int numberChildren){

@@ -193,6 +193,8 @@ if(filename!=null){
 	
 	
 	private void drawName(VoroNode child, Graphics2D g) {
+		if(child.getParent().getChildren().size()==1) return;
+		
 		// draw name
 		PolygonSimple poly = child.getPolygon();
 		if(poly==null) return;
@@ -208,11 +210,14 @@ if(filename!=null){
 		g.setFont(res);
 		FontMetrics fm = g.getFontMetrics(res);
 		Rectangle2D bounds = fm.getStringBounds(name, g);
+		double posX=(center.x-bounds.getWidth()/2.0);
+		double posY=(center.y+bounds.getHeight()/4.0);
+		g.drawString(name, (int) posX, (int) ((int)posY));
 		
-		g.drawString(name, (int) (center.x - bounds.getWidth() / 2.0), (int) (center.y-bounds.getHeight()/2.0));
-		
-		g.setColor(Color.black);
-		g.drawRect((int)center.x,(int)center.y , 10, 10);
+//		g.drawRect((int)(center.x-bounds.getWidth()/2.0), (int)(center.y-bounds.getHeight()/2.0), (int)bounds.getWidth(),(int)bounds.getHeight());
+//		
+//		g.setColor(Color.black);
+//		g.drawRect((int)center.x,(int)center.y , 10, 10);
 	}
 
 	// public Font scaleFont(String text, Rectangle rect, Graphics2D g, Font

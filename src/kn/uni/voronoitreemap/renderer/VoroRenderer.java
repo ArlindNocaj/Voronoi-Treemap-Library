@@ -135,7 +135,7 @@ public class VoroRenderer {
 				0, 1.0);
 
 		InterpolColor grayGetBrighter = new InterpolColor(1, maxHeight, 0, 0, 1.0, 0,
-				0, 0.5);
+				0, 0.7);
 		
 		Random rand=new Random(1);
 		

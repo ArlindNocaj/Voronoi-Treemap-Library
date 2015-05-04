@@ -169,9 +169,9 @@ public class VoroRenderer {
 
 		// draw text
 		for (VoroNode child : nodeList) {
-			if(child.getHeight()<=1) continue;
-			if(child.getHeight()>3) continue;
-			if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
+//			if(child.getHeight()<=1) continue;
+			if(child.getHeight()>2) continue;
+//			if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
 						
 			 g.setColor(grayGetDarker.getColorLinear(child.getHeight(),150));
 			drawName(child,g);
@@ -197,9 +197,9 @@ if(filename!=null){
 		
 		Point2D center = poly.getCentroid();
 		String name = child.getName();
-		int maxChar=10;
+		int maxChar=11;
 		if(name.length()>maxChar)
-			name=name.substring(0, 10);
+			name=name.substring(0, maxChar)+"..";
 		
 		Font res = scaleFont(name, poly, g, g.getFont());
 		if(res==null) return;

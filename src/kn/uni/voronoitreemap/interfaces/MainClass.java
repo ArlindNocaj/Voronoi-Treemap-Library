@@ -74,8 +74,8 @@ public class MainClass {
 	
 	public static String getFileName(String name, String extension){
 		
-		String fileName=name+"."+extension;
-		File file=new File(fileName);
+		String fileName=name;
+		File file=new File(fileName+"."+extension);
 		int i=1;
 		while(file.exists()){
 			String num=String.format("%03d", i);
@@ -113,7 +113,7 @@ public class MainClass {
 		    			 for (int k = i+1; k < args.length; k++) {
 		    			 if(args[k].startsWith("-")) continue;
 		    			 String filename=args[k];
-		    			 String name="VT"+new File(filename).getName();		
+		    			 String name=new File(filename).getName();		
 		    			 
 		    			 TreeData treeData = IO.readEdgeList(filename);
 		    			 

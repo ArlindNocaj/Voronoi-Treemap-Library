@@ -258,7 +258,7 @@ if(filename!=null){
 			Rectangle2D bounds = fm.getStringBounds(text, g);
 			// int width=fm.stringWidth(text);
 			double cx = center.x - bounds.getWidth() * 0.5;
-			double cy = center.y ;//- bounds.getHeight() * 0.5;
+			double cy = center.y -bounds.getHeight() * 0.5;
 			Rectangle2D.Double rect = new Rectangle2D.Double(cx, cy,
 					bounds.getWidth(), bounds.getHeight());
 			if (poly.contains(rect))

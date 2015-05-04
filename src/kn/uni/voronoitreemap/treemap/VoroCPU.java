@@ -78,7 +78,7 @@ public class VoroCPU extends Thread {
 					}
 				}
 				runningThreads.remove(this);
-				if (runningThreads.size() == 0 && cellQueue.size() == 0) {
+				if (runningThreads.size() == 0 && cellQueue.size() == 0 && (voroNode.getChildren()==null || voroNode.getChildren().size()==0 )) {
 					tellEnd.finished();
 				}
 			} catch (Exception e) {

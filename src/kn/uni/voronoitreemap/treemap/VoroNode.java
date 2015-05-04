@@ -55,6 +55,7 @@ public class VoroNode implements VoroCellObject {
 	private Site site;
 	private double wantedPercentage=0;
 	private Point2D relativeVector;
+	private String name;
 	
 	public VoroNode(int nodeID) {
 		this.nodeID = nodeID;
@@ -223,13 +224,7 @@ public class VoroNode implements VoroCellObject {
 		if (children == null || children.size() == 0)
 			return;
 		if (site != null)
-			polygon=this.site.getPolygon();
-		
-		for(VoroNode child:children){
-			if(child.getNodeID()==27802){
-				System.out.println("here");
-			}
-		}
+			polygon=this.site.getPolygon();		
 		
 		scaleRelativeVectors();
 		if (this.core == null) {
@@ -470,6 +465,10 @@ public PolygonSimple[] getChildrenPolygons(){
 		i++;
 	}
 	return polygons;
+}
+
+public void setName(String name) {
+	this.name=name;
 }
 
 

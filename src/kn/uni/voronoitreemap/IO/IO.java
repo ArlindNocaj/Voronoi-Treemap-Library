@@ -25,9 +25,6 @@ import java.util.Set;
 import kn.uni.voronoitreemap.interfaces.data.TreeData;
 import kn.uni.voronoitreemap.interfaces.data.Tuple2ID;
 import kn.uni.voronoitreemap.interfaces.data.Tuple3ID;
-import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
-
-
 public class IO {
 
 	/**
@@ -189,22 +186,22 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 	
 	public static TreeData readEdgeList(String filename) throws Exception {
 			int numLines=countLines(filename);
-			ArrayList<ArrayList<Integer>> treeAdj=new ArrayList<>(numLines);
-			ArrayList<Tuple2ID> weights=new ArrayList<Tuple2ID>(numLines);
-			
+			ArrayList<ArrayList<Integer>> treeAdj=new ArrayList<>(numLines);			
 
-			BufferedReader reader= new BufferedReader(new FileReader(filename));						
-			
+			BufferedReader reader= new BufferedReader(new FileReader(filename));									
 			
 			HashMap<String, Integer> nameToId=new HashMap<String, Integer>(numLines);
 			HashMap<Integer, String[]> nodeEntry=new HashMap<Integer, String[]>(numLines);
 			HashMap<Integer,Integer> parent=new HashMap<Integer, Integer>();
+			
+			HashMap<Integer,TreeData.Node> nodeAtt=new HashMap<>();
 			
 			String firstLine= reader.readLine();
 			String[] columnHeader = firstLine.split(";");
 //			int numCol=columnHeader.length;
 			
 			String weightCol="weight";
+			
 			
 			String line;
 			int id=0;
@@ -218,9 +215,6 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 				String[] strings = line.split(";");
 				String nodeName=strings[0];
 				String parentName=strings[1];
-				if(parentName.equals("-1")){
-					System.out.println("sss");
-				}
 
 				Integer nodeId=nameToId.get(nodeName);				
 				if(nodeId==null){
@@ -250,40 +244,61 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 			}
 			reader.close();
 			
+			
+			for(Integer key:nodeEntry.keySet()){
+				if(!nodeAtt.containsKey(key)){
+					TreeData.Node node=new TreeData.Node();
+					node.parentId=parent.get(key);
+					node.nodeId=key;					
+					nodeAtt.put(key, node);
+				}
+				
+			}
+			
 			int weightIndex=-1;
 			for (int i = 0; i < columnHeader.length; i++) 
 				if(columnHeader[i].equals(weightCol))
 					weightIndex=i;
 			
 			for(Integer key:nodeEntry.keySet()){
+				TreeData.Node node = nodeAtt.get(key);
 				String[] strings=nodeEntry.get(key);
 				double weight=1.0;
 				if(weightIndex>=0){
 				String w = strings[weightIndex];
 				weight=Double.parseDouble(w);
 				}
-				weights.add(new Tuple2ID(key, weight));				
+				node.weight=weight;				
 			}
 			
 			Integer root=0;
 			
 			while(parent.get(root)!=null){
 				root=parent.get(root);
-			}
+			}						
 			
-			for(Integer key:nameToId.values()){
-				if(!childSet.contains(key)){
-					
-					System.out.println("root: "+key);
-					System.out.println(nameToId.get(""));
+			
+			//set name for each node
+			String nodeName="name";			
+			int nameIndex=-1;
+			for (int i = 0; i < columnHeader.length; i++) 
+				if(columnHeader[i].equals(nodeName))
+					nameIndex=i;
+			for (Integer key: nodeEntry.keySet()) {
+			String[] strings=nodeEntry.get(key);	
+			String name="";
+				if(nameIndex>=0 && strings!=null){
+				name = strings[nameIndex];				
 				}
+				TreeData.Node node = nodeAtt.get(key);
+				node.name=name;
 			}
 			
-			System.out.println("Read nodes: # "+weights.size());
+			System.out.println("Read nodes: # "+nodeAtt.keySet().size());
 			
 			TreeData data=new TreeData();
 			data.tree=treeAdj;
-			data.weights=weights;
+			data.nodeAtt=nodeAtt;
 			
 			data.rootIndex=root;
 			return data;

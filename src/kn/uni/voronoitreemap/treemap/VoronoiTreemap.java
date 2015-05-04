@@ -39,6 +39,8 @@ import kn.uni.voronoitreemap.gui.JPolygon;
 import kn.uni.voronoitreemap.helper.InterpolColor;
 import kn.uni.voronoitreemap.interfaces.StatusObject;
 import kn.uni.voronoitreemap.interfaces.VoronoiTreemapInterface;
+import kn.uni.voronoitreemap.interfaces.data.TreeData;
+import kn.uni.voronoitreemap.interfaces.data.TreeData.Node;
 import kn.uni.voronoitreemap.interfaces.data.Tuple2ID;
 import kn.uni.voronoitreemap.interfaces.data.Tuple3ID;
 import kn.uni.voronoitreemap.j2d.Point2D;
@@ -101,6 +103,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	private int[] levelsMaxIteration;
 	private Set<VoroCPU> runningThreads;
 	private int rootIndex;
+	private TreeData treeData;
 
 	/** when a node is finished the status object is notified. **/
 
@@ -803,8 +806,9 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		
 		root = createVoroNode(idToNode, line);
 
-		for (int i = 1; i < numberLines; i++) {
-			createVoroNode(idToNode, treeStructure.get(i));
+		for (int i = 0; i < numberLines; i++) {
+			if(i!=rootIndex)
+				createVoroNode(idToNode, treeStructure.get(i));
 		}
 
 		for (VoroNode voroNode : idToNode.values()) {
@@ -814,6 +818,16 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		}
 
 		root.setVoroPolygon(rootPolygon);
+		
+		//set names
+		if(treeData!=null &&treeData.nodeAtt!=null){
+			for(Integer id:idToNode.keySet()){
+				VoroNode voroNode = idToNode.get(id);
+				Node node = treeData.nodeAtt.get(id);
+				
+				voroNode.setName(node.name);
+			}
+		}
 	}
 	@Override
 	public void clear() {
@@ -835,5 +849,9 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	public void setErrorAreaThreshold(double d) {
 		coreSettings.errorThreshold=d;
 		
+	}
+
+	public void setTreeData(TreeData treeData) {
+		this.treeData=treeData;
 	}	
 }

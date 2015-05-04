@@ -138,7 +138,7 @@ public class VoroRenderer {
 		InterpolColor grayGetDarker = new InterpolColor(2, maxHeight, 0, 0, 0.5, 0,
 				0, 1.0);
 
-		InterpolColor grayGetBrighter = new InterpolColor(2, maxHeight, 0, 0, 1.0, 0,
+		InterpolColor grayGetBrighter = new InterpolColor(2, maxHeight, 0, 0, 0.9, 0,
 				0, 0.5);
 		
 		Random rand=new Random(1);
@@ -190,6 +190,8 @@ if(filename!=null){
 
 	}
 
+	
+	
 	private void drawName(VoroNode child, Graphics2D g) {
 		// draw name
 		PolygonSimple poly = child.getPolygon();
@@ -207,7 +209,10 @@ if(filename!=null){
 		FontMetrics fm = g.getFontMetrics(res);
 		Rectangle2D bounds = fm.getStringBounds(name, g);
 		
-		g.drawString(name, (int) (center.x - bounds.getWidth() / 2.0), (int) (center.y));
+		g.drawString(name, (int) (center.x - bounds.getWidth() / 2.0), (int) (center.y-bounds.getHeight()/2.0));
+		
+		g.setColor(Color.black);
+		g.drawRect((int)center.x,(int)center.y , 10, 10);
 	}
 
 	// public Font scaleFont(String text, Rectangle rect, Graphics2D g, Font
@@ -231,14 +236,14 @@ if(filename!=null){
 			int width = fm.stringWidth(text);
 			if (width <= rect.width)
 				return font;
-			nextTry *= .8;
+			nextTry *= .9;
 		}
 		// return font;
 	}
 
 	public Font scaleFont(String text, PolygonSimple poly, Graphics2D g,
 			Font pFont) {
-		float nextTry = 100.0f;
+		float nextTry = 200.0f;
 		Font font = pFont;
 		Point2D center = poly.getCentroid();
 //		int x=0;
@@ -248,13 +253,13 @@ if(filename!=null){
 			Rectangle2D bounds = fm.getStringBounds(text, g);
 			// int width=fm.stringWidth(text);
 			double cx = center.x - bounds.getWidth() * 0.5;
-			double cy = center.y - bounds.getHeight() * 0.5;
+			double cy = center.y ;//- bounds.getHeight() * 0.5;
 			Rectangle2D.Double rect = new Rectangle2D.Double(cx, cy,
 					bounds.getWidth(), bounds.getHeight());
 			if (poly.contains(rect))
 				// if(width <= rect.width)
 				return font;
-			nextTry *= .8;
+			nextTry *= .9;
 		}
 //		return null;
 	}

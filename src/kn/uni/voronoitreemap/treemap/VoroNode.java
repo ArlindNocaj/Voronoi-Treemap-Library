@@ -472,6 +472,11 @@ public void setName(String name) {
 }
 
 public String getName() {
+	if(getParent().getChildren().size()==1) return "";
+	
+	if(getParent()!=null && getParent().getChildren().size()==1){
+		return getParent().getName()+"."+this.name;
+	}
 	return this.name;
 }
 

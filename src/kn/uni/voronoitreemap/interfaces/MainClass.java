@@ -121,14 +121,15 @@ public class MainClass {
 		    			     			 		    			 
 		    					    			 
 		    			 PolygonSimple rootPolygon = new PolygonSimple();
-		    				int width = 500;
+		    				int width = 1000;
 		    				int height = 500;
 		    				
-		    				int numPoints=8;
+		    				int numPoints=15;
 		    				for (int j = 0; j < numPoints; j++) {
 								double angle=2.0*Math.PI*(j*1.0/numPoints);
-		    					double y=Math.sin(angle)*height+height-200;
-		    					double x=Math.cos(angle)*width+width-200;
+								double rotate=2.0*Math.PI/numPoints/2;
+		    					double y=Math.sin(angle+rotate)*height+height;
+		    					double x=Math.cos(angle+rotate)*width+width;
 		    					rootPolygon.add(x,y);
 							}
 		

@@ -14,6 +14,7 @@ package kn.uni.voronoitreemap.gui;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,18 +36,20 @@ public static List<Color> getColors(){
 //	colors.add(new Color(8,81,156));
 //	colors.add(new Color(8,48,107));
 
-	
+	int alpha=50;
 	ArrayList<Color> colors=new ArrayList<Color>();
-	colors.add(new Color(247,251,255,128));
-	colors.add(new Color(222,235,247,128));
-	colors.add(new Color(198,219,239,128));
-	colors.add(new Color(158,202,225,128));
-	colors.add(new Color(107,174,214,128));
-	colors.add(new Color(66,146,198,128));
-	colors.add(new Color(33,113,181,128));
-	colors.add(new Color(8,81,156,128));
-	colors.add(new Color(8,48,107,128));
-
+//	colors.add(Color.gray);
+//	colors.add(new Color(255,255,255,100));
+	colors.add(new Color(247,251,255,alpha));
+	colors.add(new Color(222,235,247,alpha));
+	colors.add(new Color(198,219,239,alpha));
+	colors.add(new Color(158,202,225,alpha));
+	colors.add(new Color(107,174,214,alpha));
+	colors.add(new Color(66,146,198,alpha));
+	colors.add(new Color(33,113,181,alpha));
+	colors.add(new Color(8,81,156,alpha));
+	colors.add(new Color(8,48,107,alpha));
+//	Collections.reverse(colors);
 	return colors;
 }
 

@@ -17,6 +17,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.MultipleGradientPaint.CycleMethod;
+import java.awt.Paint;
+import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
@@ -120,63 +123,101 @@ public class VoroRenderer {
 		}
 
 		System.out.println("Elements:" + nodeList.size());
-		// svgGraphics.setBackground(Color.black);
-		// svgGraphics.clearRect(bb.x,bb.y,bb.width,bb.height);
-		// svgGraphics.setColor(Color.black);
-		// svgGraphics.setColor(new Color(245,87,0)); // orange
-		g.setColor(new Color(90, 180, 172)); // orange
-		g.setColor(Colors.getColors().get(0));
-		g.fill(rootPolygon);
-		// layeredPane.setSize(5000, 5000);
-		layeredPane.setVisible(true);
-		layeredPane.paintAll(g);
+ 
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
+		//
+		InterpolColor colRed=new InterpolColor(0, maxHeight+1, 342/360.0, 0.0, 1.0, 342/360.0, 0.6, 0.40);
 		// draw polygon border
-		InterpolColor grayGetDarker = new InterpolColor(2, maxHeight, 0, 0, 0.5, 0,
+		InterpolColor grayGetDarker = new InterpolColor(0, maxHeight, 0, 0, 0.5, 0,
 				0, 1.0);
 
-		InterpolColor grayGetBrighter = new InterpolColor(2, maxHeight, 0, 0, 0.9, 0,
+		InterpolColor grayGetBrighter = new InterpolColor(1, maxHeight, 0, 0, 1.0, 0,
 				0, 0.5);
 		
 		Random rand=new Random(1);
 		
+
+//		g.setColor(new Color(90, 180, 172)); // orange
+//		g.setColor(Colors.getColors().get(0));
+//		g.setColor(Color.white);
+		g.setColor(Color.black);
+		g.setColor(colRed.getColorLinear(2));
+		g.fill(rootPolygon);
+		 layeredPane.setSize(5000, 5000);
+		layeredPane.setVisible(true);
+		layeredPane.paintAll(g);
+		
+		
+		
+		int showLayouer=100;
 		// fill polygon
 		for (VoroNode child : nodeList) {
 			PolygonSimple poly = child.getPolygon();
-			Color fillColor = Colors.getColors().get(
-					Math.min(child.getHeight(), Colors.getColors().size() - 1));
-
+			
+			int height=child.getHeight();
+			if(height>showLayouer) continue;
+			int level=Math.min(child.getHeight(), Colors.getColors().size() - 1);
+			Color fillColor = Colors.getColors().get(level);
+			fillColor=colRed.getColorLinear(height, 50);
+			
+			
 			g.setColor(fillColor);
+			RadialGradientPaint p = getRadialGradient(poly,fillColor);
+			Paint oldP = g.getPaint();
+			g.setPaint(p);
 			g.fillPolygon(poly.getXpointsClosed(), poly.getYpointsClosed(),
-					poly.length + 1);						
+					poly.length + 1);		
+			g.setPaint(oldP);
+			
+			g.setColor(Color.DARK_GRAY);
+			Color textCol = grayGetDarker.getColorLinear(height, 180);
+			g.setColor(textCol);
+			drawName(child, g);
 			
 		}
 
 	//draw border in reverse order
 		for (VoroNode child : nodeListReverse) {
+			if(child.getHeight()>showLayouer) continue;
 			PolygonSimple poly = child.getPolygon();
 //			Color col = grayScale.getColorLinear(child.getHeight());
 			Color col = grayGetBrighter.getColorLinear(child.getHeight());
-			double width = 5 * (1.0 / child.getHeight());
+			double width = 6 * (1.0 / child.getHeight());
 			g.setStroke(new BasicStroke((int) width));
 			g.setColor(col);
+					
 			g.drawPolygon(poly.getXpointsClosed(), poly.getYpointsClosed(),
 					poly.length + 1);
 		}
+		
+		// fill polygon
+//		for (VoroNode child : nodeList) {
+//			PolygonSimple poly = child.getPolygon();
+//			int height=child.getHeight();
+//		
+//			Point2D centroid = poly.getCentroid();
+//			
+//			getRadialGradient(poly, centroid);
+//			g.setColor(fillColor);					
+//		
+//			g.fillPolygon(poly.getXpointsClosed(), poly.getYpointsClosed(),
+//					poly.length + 1);						
+//			
+//		}
 
 		// draw text
-		for (VoroNode child : nodeList) {
-//			if(child.getHeight()<=1) continue;
-			if(child.getHeight()>2) continue;
-//			if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
-						
-			 g.setColor(grayGetDarker.getColorLinear(child.getHeight(),150));
-			drawName(child,g);
-	
-		}
+//		for (VoroNode child : nodeList) {
+////			if(child.getHeight()<=1) continue;
+//			if(child.getHeight()>2) continue;
+////			if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
+//						
+//			 g.setColor(grayGetDarker.getColorLinear(child.getHeight(),150));
+//			drawName(child,g);
+//	
+//		}
 
 		
 if(filename!=null){
@@ -190,9 +231,37 @@ if(filename!=null){
 
 	}
 
+	private  RadialGradientPaint getRadialGradient(PolygonSimple poly, Color color) {
+		Point2D centroid = poly.getCentroid();
+		java.awt.geom.Point2D.Float center = new java.awt.geom.Point2D.Float((float)centroid.x,(float)centroid.y);
+		
+		float radius = (float) ((poly.getBounds().getWidth()/2.0+poly.getBounds().getHeight()/2.0)/2.0);
+		java.awt.geom.Point2D.Float focus = new java.awt.geom.Point2D.Float((float)centroid.x+30,(float)centroid.y+30);			
+//		 float[] dist = {0.0f, 0.3f, 1.0f};
+//		 Color[] colors = {Color.white, Color.gray,color};
+		 float[] dist = {0.0f, 0.8f};
+//		 color=color.brighter();
+		 Color colorA = new Color(color.getRed(),color.getGreen(),color.getBlue(),5);
+//		 colorA=new Color(255, 255, 255,90);
+//		 colorA=color.brighter().brighter().brighter();
+		 Color[] colors = {colorA,color};
+//		 Color[] colors = {Color.white, color};
+//		 RadialGradientPaint p =
+//		     new RadialGradientPaint(center, radius, focus,
+//		                             dist, colors,
+//		                             CycleMethod.NO_CYCLE);
+		 RadialGradientPaint p = new RadialGradientPaint(center, radius, dist, colors);
+		 return p;
+	}
+
 	
 	
 	private void drawName(VoroNode child, Graphics2D g) {
+		if(child.getHeight()>2) return;
+//		if(child.getHeight()>2) continue;
+////		if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
+		
+		
 		if(child.getParent().getChildren().size()==1) return;
 		
 		// draw name
@@ -220,16 +289,6 @@ if(filename!=null){
 //		g.drawRect((int)center.x,(int)center.y , 10, 10);
 	}
 
-	// public Font scaleFont(String text, Rectangle rect, Graphics2D g, Font
-	// pFont) {
-	// float fontSize = 20.0f;
-	// Font font = pFont;
-	//
-	// font = g.getFont().deriveFont(fontSize);
-	// int width = g.getFontMetrics(font).stringWidth(text);
-	// fontSize = (rect.width / width ) * fontSize;
-	// return g.getFont().deriveFont(fontSize);
-	// }
 
 	public Font scaleFont(String text, Rectangle rect, Graphics2D g, Font pFont) {
 		float nextTry = 100.0f;

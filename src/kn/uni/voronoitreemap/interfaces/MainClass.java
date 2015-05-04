@@ -146,13 +146,13 @@ public class MainClass {
 			    		    ((VoronoiTreemap)treemap).setTreeData(treeData);
 			    			treemap.setTreeAndWeights(rootPolygon, treeData.tree, null, null);		    					    			
 			    			treemap.setCancelOnMaxIteration(true);
-			    			treemap.setNumberThreads(1);
+			    			treemap.setNumberThreads(8);
 			    			treemap.setCancelOnThreshold(true);
 			    			treemap.setNumberMaxIterations(3000);
 			    			treemap.setErrorAreaThreshold(0.05);
 //			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt")));
 			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), (VoronoiTreemap) treemap));
-			    			treemap.compute();
+			    			treemap.computeLocked();
 		    			
 		    		 }
 		    		 }

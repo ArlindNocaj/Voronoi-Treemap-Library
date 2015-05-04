@@ -12,6 +12,17 @@
  ******************************************************************************/
 package kn.uni.voronoitreemap.IO;
 
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import de.erichseifert.vectorgraphics2d.PDFGraphics2D;
 import kn.uni.voronoitreemap.interfaces.StatusObject;
 import kn.uni.voronoitreemap.interfaces.VoronoiTreemapInterface;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
@@ -20,25 +31,47 @@ import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
 
 /**
  * Class to write the result out as PNG file, e.g. when used from command line.
+ * 
  * @author Arlind Nocaj
- *
+ * 
  */
-public class PNGStatusObject implements StatusObject {
+public class PDFStatusObject implements StatusObject {
 
-	
 	private String filename;
 	private VoronoiTreemap treemap;
 
-	public PNGStatusObject(String filename, VoronoiTreemap treemap){
-		this.filename=filename;
-		this.treemap=treemap;
-		
+	public PDFStatusObject(String filename, VoronoiTreemap treemap) {
+		this.filename = filename;
+		this.treemap = treemap;
+
 	}
+
 	@Override
 	public void finished() {
-		VoroRenderer renderer=new VoroRenderer();
+		PolygonSimple rootPolygon = treemap.getRootPolygon();
+		Rectangle rootRect = rootPolygon.getBounds();
+		PDFGraphics2D g;
+
+		// Create a new PDF document with a width of 210 and a height of 297
+		g = new PDFGraphics2D(0.0, 0.0, rootRect.getWidth(),
+				rootRect.getHeight());
+
+		VoroRenderer renderer = new VoroRenderer();
 		renderer.setTreemap(treemap);
-		renderer.renderTreemap(filename);
+		renderer.setGraphics2D(g);
+		renderer.renderTreemap(null);
+
+		// Write the PDF output to a file
+		FileOutputStream file = null;		
+		try {
+			file = new FileOutputStream(filename + ".pdf");
+			file.write(g.getBytes());
+			file.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override

@@ -3,5 +3,10 @@
 	<classpathentry kind="src" path="power-diagram/src"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/VectorGraphics2D-0.9.1.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/Voronoi-Treemap-Library/libs/VectorGraphics2D-0.9.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

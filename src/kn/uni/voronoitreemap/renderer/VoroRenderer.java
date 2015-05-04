@@ -185,7 +185,7 @@ public class VoroRenderer {
 			PolygonSimple poly = child.getPolygon();
 //			Color col = grayScale.getColorLinear(child.getHeight());
 			Color col = grayGetBrighter.getColorLinear(child.getHeight());
-			double width = 6 * (1.0 / child.getHeight());
+			double width = 7* (1.0 / (child.getHeight()*child.getHeight()));
 			g.setStroke(new BasicStroke((int) width));
 			g.setColor(col);
 					

@@ -16,6 +16,7 @@ import kn.uni.voronoitreemap.interfaces.StatusObject;
 import kn.uni.voronoitreemap.interfaces.VoronoiTreemapInterface;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.renderer.VoroRenderer;
+import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
 
 /**
  * Class to write the result out as PNG file, e.g. when used from command line.
@@ -26,9 +27,9 @@ public class PNGStatusObject implements StatusObject {
 
 	
 	private String filename;
-	private VoronoiTreemapInterface treemap;
+	private VoronoiTreemap treemap;
 
-	public PNGStatusObject(String filename, VoronoiTreemapInterface treemap){
+	public PNGStatusObject(String filename, VoronoiTreemap treemap){
 		this.filename=filename;
 		this.treemap=treemap;
 		

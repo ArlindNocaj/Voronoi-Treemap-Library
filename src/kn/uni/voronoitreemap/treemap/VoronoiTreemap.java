@@ -833,7 +833,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 
 	public void setUniformWeights(boolean considerWeights) {
 		this.uniformWeights = considerWeights;
-		for(VoroNode node:idToNode.values())
+		if(uniformWeights)
+			for(VoroNode node:idToNode.values())
 			node.setWeight(1.0);		
 	}
 }

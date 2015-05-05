@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import kn.uni.voronoitreemap.interfaces.data.TreeData;
-import kn.uni.voronoitreemap.interfaces.data.TreeData.Node;
 import kn.uni.voronoitreemap.interfaces.data.Tuple2ID;
 import kn.uni.voronoitreemap.interfaces.data.Tuple3ID;
 public class IO {
@@ -248,7 +247,7 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 			
 			for(Integer key:nodeEntry.keySet()){
 				if(!nodeAtt.containsKey(key)){
-					Node node=new Node();
+					TreeData.Node node=new TreeData.Node();
 					node.parentId=parent.get(key);
 					node.nodeId=key;					
 					nodeAtt.put(key, node);
@@ -262,7 +261,7 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 					weightIndex=i;
 			
 			for(Integer key:nodeEntry.keySet()){
-				Node node = nodeAtt.get(key);
+				TreeData.Node node = nodeAtt.get(key);
 				String[] strings=nodeEntry.get(key);
 				double weight=1.0;
 				if(weightIndex>=0){
@@ -291,7 +290,7 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 				if(nameIndex>=0 && strings!=null){
 				name = strings[nameIndex];				
 				}
-				Node node = nodeAtt.get(key);
+				TreeData.Node node = nodeAtt.get(key);
 				node.name=name;
 			}
 			

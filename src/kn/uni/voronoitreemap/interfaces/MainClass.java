@@ -47,31 +47,14 @@ import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
  *
  */
 public class MainClass {
-
-	
-	public static VoronoiTreemapInterface getInstance(StatusObject object){
-		return new VoronoiTreemap(object);
-	}
-	
-	public static VoronoiTreemapInterface getInstance(){
-		return new VoronoiTreemap();
-	}
+		
 	
 	/**
-	 * 
-	 * Returning an instance of the implementation of the VoronoiTreemapInterface
-	 * @param object 
-	 * 			On the StatusObject is finished() and finishedNode(...) called after the computation
-	 * @param multiThreaded
-	 * 			Whether multithreading is used or not.
+	 * Returns a file name
+	 * @param name
+	 * @param extension
 	 * @return
-	 * 		returns an instance of an implementation of the VoronoiTreemapInterface
 	 */
-	
-	public static VoronoiTreemapInterface getInstance(StatusObject object,boolean multiThreaded){
-		return new VoronoiTreemap(object, multiThreaded);
-	}
-	
 	public static String getFileName(String name, String extension){
 		
 		String fileName=name;
@@ -83,9 +66,6 @@ public class MainClass {
 			file=new File(fileName+"."+extension);
 			i++;
 		}
-		
-		
-		
 		return fileName;		
 	}
 	
@@ -101,7 +81,7 @@ public class MainClass {
 		      return;
 		    }
 		    try {
-		    	VoronoiTreemapInterface treemap=null;
+		    	
 		    	for (int i = 0; i < args.length; i++) {
 		    		if (!args[i].startsWith("-")) {
 //		    	        throw new Exception("parsing error, options must start with a minus: \"" + args[i] + "\"");
@@ -113,12 +93,7 @@ public class MainClass {
 		    			 for (int k = i+1; k < args.length; k++) {
 		    			 if(args[k].startsWith("-")) continue;
 		    			 String filename=args[k];
-		    			 String name=new File(filename).getName();		
-		    			 
-		    			 TreeData treeData = IO.readEdgeList(filename);
-		    			 
-//		    			 ArrayList<ArrayList<Integer>> tree = IO.readTree(filename);		    			 
-		    			     			 		    			 
+		    			 String name=new File(filename).getName();				    			 	 		    			 
 		    					    			 
 		    			 PolygonSimple rootPolygon = new PolygonSimple();
 		    				int width = 1000;
@@ -133,28 +108,29 @@ public class MainClass {
 		    					rootPolygon.add(x,y);
 							}
 		
-		    			VoronoiCore.setDebugMode();	
+	
 		    				
 //		    				rootPolygon.add(0, 0);
 //		    				rootPolygon.add(width, 0);
 //		    				rootPolygon.add(width, height);
 //		    				rootPolygon.add(0, height);
 
-		    			
-		    			   treemap=new VoronoiTreemap();
-			    		    ((VoronoiTreemap)treemap).setRootIndex(treeData.rootIndex);
-			    		    
-			    		    ((VoronoiTreemap)treemap).setTreeData(treeData);
-			    			treemap.setTreeAndWeights(rootPolygon, treeData.tree, null, null);		    					    			
+		    				
+		    				
+//			    			VoronoiCore.setDebugMode(); 
+		    			   VoronoiTreemap treemap = new VoronoiTreemap();
+		    			   treemap.setRootPolygon(rootPolygon);
+		    			   treemap.readEdgeList(filename);			    			    					    			
 			    			treemap.setCancelOnMaxIteration(true);
-			    			treemap.setNumberThreads(1);
-			    			treemap.setCancelOnThreshold(true);
 			    			treemap.setNumberMaxIterations(2000);
+			    			treemap.setCancelOnThreshold(true);
 			    			treemap.setErrorAreaThreshold(0.02);
+			    			
+			    			treemap.setNumberThreads(8);			    						    			
+			    			
 //			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt")));
 			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), (VoronoiTreemap) treemap));
-			    			treemap.computeLocked();
-		    			
+			    			treemap.computeLocked();		    			
 		    		 }
 		    		 }
 		    		 
@@ -163,9 +139,7 @@ public class MainClass {
 		    	if (args.length==1){
 		    		
 		    	}
-		    	// treemap.setNumberThreads(1);
-		    	// VoronoiCore.setDebugMode();
-		    
+
 		    }catch(Exception e){
 		    	e.printStackTrace();
 		    }

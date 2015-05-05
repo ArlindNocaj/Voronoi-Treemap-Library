@@ -7,13 +7,10 @@ import java.util.HashMap;
 
 public class TreeData {
 
-	public ArrayList<ArrayList<Integer>> tree;
-	public ArrayList<Tuple2ID> weights;
-	public ArrayList<Tuple3ID> relativeCoord;
+	public ArrayList<ArrayList<Integer>> tree;	
 	public Integer rootIndex;
 		
 	public HashMap<Integer, Node> nodeAtt;	
-	
 	
 	
 	public static class Node{

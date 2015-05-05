@@ -32,13 +32,12 @@ import java.util.concurrent.Semaphore;
 
 import javax.swing.JLayeredPane;
 
+import kn.uni.voronoitreemap.IO.IO;
 import kn.uni.voronoitreemap.core.VoroSettings;
 import kn.uni.voronoitreemap.core.VoronoiCore;
 import kn.uni.voronoitreemap.debug.ImageFrame;
 import kn.uni.voronoitreemap.gui.JPolygon;
-import kn.uni.voronoitreemap.helper.InterpolColor;
 import kn.uni.voronoitreemap.interfaces.StatusObject;
-import kn.uni.voronoitreemap.interfaces.VoronoiTreemapInterface;
 import kn.uni.voronoitreemap.interfaces.data.TreeData;
 import kn.uni.voronoitreemap.interfaces.data.TreeData.Node;
 import kn.uni.voronoitreemap.interfaces.data.Tuple2ID;
@@ -52,8 +51,7 @@ import kn.uni.voronoitreemap.j2d.Site;
  * @author nocaj
  *
  */
-public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
-		VoronoiTreemapInterface {
+public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	/**
 	 * DEBUGGING
 	 */
@@ -70,15 +68,15 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	private boolean initialized = false;
 
 	private boolean useBorder = false;
-	
+	private boolean considerWeights=false;
 	private double shrinkPercentage = 1;
 	private boolean showLeafs = false;
 
 	private int numberThreads = 1;
 	protected VoroNode root;
 	private PolygonSimple rootPolygon;
-	public static InterpolColor interpolColor = new InterpolColor(0, 1, 0.0,
-			0.73, 0.58, 224.0 / 225.0, 0.73, 0.58);
+	
+	
 	int amountAllNodes = 0;
 	int alreadyDoneNodes = 0;
 
@@ -209,7 +207,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		VoronoiCore.setDebugMode();
 		// VoronoiCore.graphics.translate(-178,-483);
 		// VoronoiCore.graphics.scale(5, 5);
-		VoronoiTreemapInterface voronoiTreemap = new VoronoiTreemap();
+		VoronoiTreemap voronoiTreemap = new VoronoiTreemap();
 		voronoiTreemap.setUseBorder(true);
 		voronoiTreemap.setShrinkPercentage(0.95);
 
@@ -276,37 +274,32 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	public void setRootIndex(int rootIndex) {
 		this.rootIndex = rootIndex;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see treemap.voronoiTreemapInterface#setTreeAndWeights(j2d.PolygonSimple,
-	 * java.util.ArrayList, java.util.ArrayList, java.util.ArrayList)
-	 */
-	public void setTreeAndWeights(PolygonSimple rootPolygon,
-			final ArrayList<ArrayList<Integer>> treeStructure,
-			final ArrayList<Tuple2ID> areaGoals,
-			ArrayList<Tuple3ID> relativePositions) {
-		this.rootPolygon = rootPolygon;
 
-		setTree(treeStructure);
-		setAreaGoals(areaGoals);
-		this.relativePositions=relativePositions;
-		root.setVoroPolygon(rootPolygon);
-
-	}
 
 	private void setRelativePositions(ArrayList<Tuple3ID> relativePositions) {
-		if (relativePositions == null) {			
-//		root.setSpiralRelativeCoordinates();	
-			
-			for (VoroNode voroNode : idToNode.values()) {
+		if (relativePositions == null) {										
+			for (VoroNode voroNode : idToNode.values()) {				
 				double x = rand.nextDouble();
 				double y = rand.nextDouble();
 				voroNode.setRelativeVector(new Point2D(x, y));
 			}
-		} else {
-			setReferenceMap(relativePositions);
+			return;
+		}
+		
+		setReferenceMap(relativePositions);
+		
+	}
+	
+	public void setReferenceMap(ArrayList<Tuple3ID> relativePositions) {
+		for (Tuple3ID tuple : relativePositions) {
+			VoroNode voroNode = null;
+			voroNode = idToNode.get(tuple.id);
+			if (voroNode != null) {
+
+				voroNode.setRelativeVector(new Point2D(tuple.valueX,
+						tuple.valueY));
+			} 	
+			else System.out.println("node id could not be found for setting reference position: "+tuple.id);
 		}
 	}
 
@@ -667,6 +660,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 	 */
 	public void setRootPolygon(PolygonSimple rootPolygon) {
 		this.rootPolygon = rootPolygon;
+		if(root!=null)
+		root.setPolygon(rootPolygon);
 	}
 
 	/*
@@ -681,6 +676,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 		rootPolygon.add(x + width, y);
 		rootPolygon.add(x + width, y + height);
 		rootPolygon.add(x, y + height);
+		root.setPolygon(rootPolygon);
 	}
 
 	/**
@@ -758,46 +754,6 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 			statusObject.finishedNode(Node, layer, children, polygons);
 	}
 
-	@Override
-	public void setAreaGoals(ArrayList<Tuple2ID> areaGoals) {
-		if (areaGoals != null) {
-			for (Tuple2ID tuple : areaGoals) {
-				VoroNode voroNode = null;
-				voroNode = idToNode.get(tuple.id);
-				if (voroNode != null) {
-					voroNode.setWeight(tuple.value);
-					
-				}else if(tuple.id==root.getNodeID()){
-					//we do not care, we don't need the weighting of the root
-					
-				
-				} else{
-					System.out.println("id: "+tuple.id);
-					throw new RuntimeException(
-							"There is no node in the tree structure with this ID.");
-			}
-		}
-		}
-	}
-
-	@Override
-	public void setReferenceMap(ArrayList<Tuple3ID> relativePositions) {
-		for (Tuple3ID tuple : relativePositions) {
-			VoroNode voroNode = null;
-			voroNode = idToNode.get(tuple.id);
-			if (voroNode != null) {
-
-				voroNode.setRelativeVector(new Point2D(tuple.valueX,
-						tuple.valueY));
-			} else if(tuple.id == root.getNodeID()){
-				//we do not care, we can't set a relative position for the root	
-			} else
-				throw new RuntimeException(
-						"ReferencePosition for ID without node in the tree structure.");
-		}
-	}
-
-	@Override
 	public void setTree(ArrayList<ArrayList<Integer>> treeStructure) {
 		idToNode = new HashMap<Integer, VoroNode>();
 
@@ -817,35 +773,24 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 			voroNode.setRelativeVector(new Point2D(x, y));
 		}
 
-		root.setVoroPolygon(rootPolygon);
-		
-		//set names
-		if(treeData!=null &&treeData.nodeAtt!=null){
-			for(Integer id:idToNode.keySet()){
-				VoroNode voroNode = idToNode.get(id);
-				Node node = treeData.nodeAtt.get(id);
-				voroNode.setWeight(node.weight);
-				voroNode.setName(node.name);
-			}
-		}
+		root.setVoroPolygon(rootPolygon);	
 	}
-	@Override
+	
 	public void clear() {
 		init();
 	}
 
-		@Override
 	public void setRandomSeed(long seed) {
 		randomSeed=seed;
 		rand.setSeed(seed);
 	}
 
-	@Override
+
 	public long getRandomSeed() {
 		return randomSeed;
 	}
 
-	@Override
+
 	public void setErrorAreaThreshold(double d) {
 		coreSettings.errorThreshold=d;
 		
@@ -853,5 +798,32 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 
 	public void setTreeData(TreeData treeData) {
 		this.treeData=treeData;
+		rootIndex=treeData.rootIndex;		
+
+		
+		setTree(treeData.tree);				
+		root.setVoroPolygon(rootPolygon);
+		
+		
+		//set names and weights
+		if(treeData!=null &&treeData.nodeAtt!=null){
+			for(Integer id:idToNode.keySet()){
+				VoroNode voroNode = idToNode.get(id);
+				Node node = treeData.nodeAtt.get(id);
+				if(considerWeights)
+					voroNode.setWeight(node.weight);
+				voroNode.setName(node.name);
+			}
+		}
+		
 	}	
+	
+	public void readEdgeList(String file){
+		try {
+			TreeData data = IO.readEdgeList(file);
+			setTreeData(data);			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

@@ -40,7 +40,6 @@ import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 import kn.uni.voronoitreemap.gui.Colors;
 import kn.uni.voronoitreemap.gui.JPolygon;
 import kn.uni.voronoitreemap.helper.InterpolColor;
-import kn.uni.voronoitreemap.interfaces.VoronoiTreemapInterface;
 import kn.uni.voronoitreemap.j2d.Point2D;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.treemap.VoroNode;
@@ -77,7 +76,7 @@ public class VoroRenderer {
 		this.treemap = treemap;
 	}
 
-	public VoronoiTreemapInterface getTreemap() {
+	public VoronoiTreemap getTreemap() {
 		return treemap;
 	}
 
@@ -135,7 +134,7 @@ public class VoroRenderer {
 				0, 1.0);
 
 		InterpolColor grayGetBrighter = new InterpolColor(1, maxHeight, 0, 0, 1.0, 0,
-				0, 0.7);
+				0, 0.9);
 		
 		Random rand=new Random(1);
 		
@@ -257,7 +256,7 @@ if(filename!=null){
 	
 	
 	private void drawName(VoroNode child, Graphics2D g) {
-		if(child.getHeight()>3) return;
+		if(child.getHeight()>2) return;
 //		if(child.getHeight()>2) continue;
 ////		if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
 		

@@ -165,27 +165,15 @@ public class VoronoiCore {
 
 		 moveSites(sites);
 	     checkPointsInPolygon(sites);
-
-	     //	     fixNoPolygonSites();
-//	    voroDiagram();
+	     	
+//	    voroDiagram();//does not seem to be necessary
 //	     	    fixNoPolygonSites();
-//	     if(frame!=null)frame.repaintWithWait(4);
+
 		// adapt weights
 		adaptWeightsSimple(sites);
-//		 if(frame!=null)frame.repaintWithWait(4);
-//		adjustWeightsToBePositive(sites);// not necessary, power diagram seems to handle negative weights as well
-//		if(frame!=null)frame.repaintWithWait(4);
 		voroDiagram();	
-//		 if(frame!=null)frame.repaintWithWait(4);
-//		printCoreCode();
+
 		
-//		if(currentIteration>settings.maxIterat){
-//			if(currentIteration%1000==1){
-//				randomizePoints(sites);
-//				adjustWeightsToBePositive(sites);
-//				fixWeightsIfDominated(sites);		
-//			}
-//		}
 		
 //		fixNoPolygonSites();
 //		fixWeightsIfDominated(sites);
@@ -304,7 +292,7 @@ public class VoronoiCore {
 	private void adaptWeightsSimple(OpenList sites) {
 		Site[] array = sites.array;
 		int size = sites.size;
-
+		Random rand=new Random(5);
 		double averageDistance=getGlobalAvgNeighbourDistance(sites);
 //		double averageWeight=getAvgWeight(sites);
 //		averageDistance+=averageWeight;
@@ -326,17 +314,17 @@ public class VoronoiCore {
 			double step=0;
 			double errorTransform=(-(error-1)*(error-1)+1);
 			
-//			errorTransform=error;
+			errorTransform=error;
 //			errorTransform=Math.max(errorTransform, settings.errorThreshold);
 			
-			if(currentIteration%200==0) errorTransform*=rand.nextDouble();
+//			if(currentIteration%200==0) errorTransform*=rand.nextDouble();
 			
 			step=1.0*averageDistance*errorTransform;
 //			step=2*averageDistance*error;
-			double epsilon=0.01;
-			if(increase<1.0-epsilon)
+
+			if(increase<1.0)
 				weight-=step;
-			else if (increase>1.0+epsilon) weight+=step;
+			else if (increase>1.0) weight+=step;
 				point.setWeight(weight);
 
 

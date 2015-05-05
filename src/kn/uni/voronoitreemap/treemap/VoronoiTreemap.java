@@ -824,7 +824,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject,
 			for(Integer id:idToNode.keySet()){
 				VoroNode voroNode = idToNode.get(id);
 				Node node = treeData.nodeAtt.get(id);
-				
+				voroNode.setWeight(node.weight);
 				voroNode.setName(node.name);
 			}
 		}

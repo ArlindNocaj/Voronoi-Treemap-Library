@@ -22,6 +22,8 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Random;
 
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
+
 import jdk.internal.jfr.events.ErrorThrownEvent;
 import kn.uni.voronoitreemap.datastructure.OpenList;
 import kn.uni.voronoitreemap.debug.ImageFrame;
@@ -177,6 +179,13 @@ public class VoronoiCore {
 //		 if(frame!=null)frame.repaintWithWait(4);
 //		printCoreCode();
 		
+//		if(currentIteration>settings.maxIterat){
+//			if(currentIteration%1000==1){
+//				randomizePoints(sites);
+//				adjustWeightsToBePositive(sites);
+//				fixWeightsIfDominated(sites);		
+//			}
+//		}
 		
 //		fixNoPolygonSites();
 //		fixWeightsIfDominated(sites);
@@ -295,6 +304,7 @@ public class VoronoiCore {
 	private void adaptWeightsSimple(OpenList sites) {
 		Site[] array = sites.array;
 		int size = sites.size;
+
 		double averageDistance=getGlobalAvgNeighbourDistance(sites);
 //		double averageWeight=getAvgWeight(sites);
 //		averageDistance+=averageWeight;
@@ -312,22 +322,24 @@ public class VoronoiCore {
 			double increase = wantedArea / currentArea;
 			
 			double weight=point.getWeight();
-				
+	
 			double step=0;
 			double errorTransform=(-(error-1)*(error-1)+1);
 			
 //			errorTransform=error;
 //			errorTransform=Math.max(errorTransform, settings.errorThreshold);
 			
-
+			if(currentIteration%200==0) errorTransform*=rand.nextDouble();
+			
 			step=1.0*averageDistance*errorTransform;
 //			step=2*averageDistance*error;
-			if(increase<1.0)
+			double epsilon=0.01;
+			if(increase<1.0-epsilon)
 				weight-=step;
-			else if (increase>1.0) weight+=step;
+			else if (increase>1.0+epsilon) weight+=step;
 				point.setWeight(weight);
 
-//			point.setWeight(0);
+
 			//debug purpose
 			point.setLastIncrease(increase);
 

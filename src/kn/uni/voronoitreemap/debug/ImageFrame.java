@@ -102,7 +102,7 @@ public class ImageFrame extends JFrame{
 		setSize((int)bounds.getWidth(), (int)bounds.getHeight());
 		setVisible(true); 
 		}
-//		coreList.clear();
+		coreList.clear();
 		coreList.add(core);
 	    
 	}

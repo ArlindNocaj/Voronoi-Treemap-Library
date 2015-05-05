@@ -25,29 +25,8 @@ import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
 
 
-/**
- * Started implementing for command line use. But not finished yet...<br>
- * Example to use the VoronoiTreemapLibrary: <br>
- * > Create an implementation of the StatusObject-interface.<br>
- * > Create the root polygon:<br>
- * PolygonSimple root = new PolygonSimple(4);<br>
- * root.add(0,0); root.add(800,0); root.add(800,800); root.add(0,800);<br>
- * > Create a StatusObject of your implementation<br>
- * StatusObjectImpl statusObject = new StatusObjectImpl();<br>
- * > Get VoronoiTreemapInterface instance:<br>
- * VoronoiTreemapInterface voronoiTreemap = MainClass.getInstance(statusObject,true);<br>
- * > Insert the tree structure <br>
- * List<List<Integer>> treeStructure = ...; <br>
- * voronoiTreemap.setTreeAndWeights(root, treeStructure, null, null);<br>
- * > Compute the voronoi treemap<br>
- * voronoiTreemap.compute();<br>
- * > Handle the results in statusObject.finished() or respectively in statusObject.finishedNode(int node, int layer, int[] children, PolygonSimple[] polygons) <br>
- * @author nocaj
- *
- *
- */
-public class MainClass {
-		
+
+public class MainClass {		
 	
 	/**
 	 * Returns a file name
@@ -73,9 +52,6 @@ public class MainClass {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		
-		
 		if (args.length == 0) {
 		      System.out.println("VoroTreemap v0.2 - Voronoi Treemap library for Java   (c) 2015 University of Konstanz\n  usage: VoroTreemap  [options] infile        see manual for more details\n  options \n   -iF Filename \n");
 		      return;
@@ -96,10 +72,10 @@ public class MainClass {
 		    			 String name=new File(filename).getName();				    			 	 		    			 
 		    					    			 
 		    			 PolygonSimple rootPolygon = new PolygonSimple();
-		    				int width = 1000;
+		    				int width = 500;
 		    				int height = 500;
 		    				
-		    				int numPoints=12;
+		    				int numPoints=8;
 		    				for (int j = 0; j < numPoints; j++) {
 								double angle=2.0*Math.PI*(j*1.0/numPoints);
 								double rotate=2.0*Math.PI/numPoints/2;
@@ -117,7 +93,7 @@ public class MainClass {
 
 		    				
 		    				
-//			    			VoronoiCore.setDebugMode(); 
+			    			VoronoiCore.setDebugMode(); 
 		    			   VoronoiTreemap treemap = new VoronoiTreemap();
 		    			   treemap.setRootPolygon(rootPolygon);
 		    			   treemap.readEdgeList(filename);			    			    					    			
@@ -125,9 +101,9 @@ public class MainClass {
 			    			treemap.setNumberMaxIterations(2000);
 			    			treemap.setCancelOnThreshold(true);
 			    			treemap.setErrorAreaThreshold(0.02);
-			    			treemap.setUniformWeights(false);
+			    			treemap.setUniformWeights(true);
 			    			
-			    			treemap.setNumberThreads(8);			    						    			
+			    			treemap.setNumberThreads(1);			    						    			
 			    			
 //			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt")));
 			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), (VoronoiTreemap) treemap));
@@ -135,10 +111,6 @@ public class MainClass {
 		    		 }
 		    		 }
 		    		 
-		    	}
-		    	 
-		    	if (args.length==1){
-		    		
 		    	}
 
 		    }catch(Exception e){

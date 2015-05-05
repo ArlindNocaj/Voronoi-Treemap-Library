@@ -162,9 +162,10 @@ public class VoronoiCore {
 
 	
 	public void iterateSimple() {
-
+//		if(currentIteration<=settings.maxIterat){
 		 moveSites(sites);
 	     checkPointsInPolygon(sites);
+//		}
 	     	
 //	    voroDiagram();//does not seem to be necessary
 //	     	    fixNoPolygonSites();
@@ -304,27 +305,28 @@ public class VoronoiCore {
 //			if(poly==null) 
 //				System.out.println(point.getWeight()+"\t"+error);
 			double completeArea = clipPolygon.getArea();
-			double currentArea = (poly == null) ? 0.0000000001 : poly.getArea();	
+			double currentArea = (poly == null) ? 0.0 : poly.getArea();	
 			double wantedArea = completeArea * point.getPercentage();
 			
-			double increase = wantedArea / currentArea;
+			double increase = wantedArea / currentArea;			
+			if(currentArea==0.0)
+				increase=2.0;
 			
 			double weight=point.getWeight();
 	
 			double step=0;
 			double errorTransform=(-(error-1)*(error-1)+1);
 			
-			errorTransform=error;
-//			errorTransform=Math.max(errorTransform, settings.errorThreshold);
-			
-//			if(currentIteration%200==0) errorTransform*=rand.nextDouble();
+//			errorTransform=error;
+//			errorTransform=Math.max(errorTransform, settings.errorThreshold);			
+//			if(currentIteration>settings.maxIterat) errorTransform*=rand.nextDouble();
 			
 			step=1.0*averageDistance*errorTransform;
 //			step=2*averageDistance*error;
-
-			if(increase<1.0)
+			double epsilon = 0.01;
+			if(increase<(1.0-epsilon))
 				weight-=step;
-			else if (increase>1.0) weight+=step;
+			else if (increase>(1.0+epsilon)) weight+=step;
 				point.setWeight(weight);
 
 
@@ -816,6 +818,7 @@ public class VoronoiCore {
 			e.printStackTrace();
 		}
 		
+		
 //		g.translate(center.x, center.y);
 //		g.scale(1/scale,1/scale);
 		
@@ -873,6 +876,7 @@ public class VoronoiCore {
 		}	
 		
 	}	
+
 
 	public void setSites(OpenList sites) {
 		this.sites = sites;

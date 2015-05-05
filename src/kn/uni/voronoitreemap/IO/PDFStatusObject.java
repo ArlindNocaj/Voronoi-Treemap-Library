@@ -67,7 +67,6 @@ public class PDFStatusObject implements StatusObject {
 			file = new FileOutputStream(filename + ".pdf");
 			file.write(g.getBytes());
 			file.close();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

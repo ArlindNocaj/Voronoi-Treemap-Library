@@ -35,7 +35,7 @@ import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
  * 
  */
 public class PDFStatusObject implements StatusObject {
-
+	int border=10;
 	private String filename;
 	private VoronoiTreemap treemap;
 
@@ -50,13 +50,14 @@ public class PDFStatusObject implements StatusObject {
 		PolygonSimple rootPolygon = treemap.getRootPolygon();
 		Rectangle rootRect = rootPolygon.getBounds();
 		PDFGraphics2D g;
-
+		
 		// Create a new PDF document with a width of 210 and a height of 297
-		g = new PDFGraphics2D(0.0, 0.0, rootRect.getWidth(),
-				rootRect.getHeight());
+		g = new PDFGraphics2D(0.0, 0.0, rootRect.getWidth()+2*border,
+				rootRect.getHeight()+2*border);
 
 		VoroRenderer renderer = new VoroRenderer();
 		renderer.setTreemap(treemap);
+		g.translate(border, border);
 		renderer.setGraphics2D(g);
 		renderer.renderTreemap(null);
 

@@ -89,9 +89,11 @@ public class VoroRenderer {
 		Rectangle rootRect = rootPolygon.getBounds();
 
 		if (g == null) {
-			bufferImage = new BufferedImage(rootRect.width, rootRect.height,
+			int border=5;
+			bufferImage = new BufferedImage(rootRect.width+border, rootRect.height+border,
 					BufferedImage.TYPE_INT_ARGB);
 			g = bufferImage.createGraphics();
+			g.translate(border, border);
 		}
 		double translateX = -rootRect.getMinX();
 		double translateY = -rootRect.getMinY();

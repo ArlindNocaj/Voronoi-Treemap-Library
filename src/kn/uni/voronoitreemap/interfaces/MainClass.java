@@ -72,7 +72,7 @@ public class MainClass {
 		    			 String name=new File(filename).getName();				    			 	 		    			 
 		    					    			 
 		    			 PolygonSimple rootPolygon = new PolygonSimple();
-		    				int width = 500;
+		    				int width = 800;
 		    				int height = 500;
 		    				
 		    				int numPoints=8;
@@ -93,17 +93,17 @@ public class MainClass {
 
 		    				
 		    				
-			    			VoronoiCore.setDebugMode(); 
-		    			   VoronoiTreemap treemap = new VoronoiTreemap();
-		    			   treemap.setRootPolygon(rootPolygon);
-		    			   treemap.readEdgeList(filename);			    			    					    			
+//			    			VoronoiCore.setDebugMode(); 
+		    				VoronoiTreemap treemap = new VoronoiTreemap();
+		    			   	treemap.setRootPolygon(rootPolygon);
+		    			   	treemap.readEdgeList(filename);			    			    					    			
 			    			treemap.setCancelOnMaxIteration(true);
 			    			treemap.setNumberMaxIterations(2000);
 			    			treemap.setCancelOnThreshold(true);
 			    			treemap.setErrorAreaThreshold(0.02);
 			    			treemap.setUniformWeights(true);
 			    			
-			    			treemap.setNumberThreads(1);			    						    			
+			    			treemap.setNumberThreads(8);			    						    			
 			    			
 //			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt")));
 			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), (VoronoiTreemap) treemap));

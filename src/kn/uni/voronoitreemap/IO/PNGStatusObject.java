@@ -12,6 +12,14 @@
  ******************************************************************************/
 package kn.uni.voronoitreemap.IO;
 
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import kn.uni.voronoitreemap.interfaces.StatusObject;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.renderer.VoroRenderer;
@@ -24,7 +32,7 @@ import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
  */
 public class PNGStatusObject implements StatusObject {
 
-	
+	int border=10;
 	private String filename;
 	private VoronoiTreemap treemap;
 
@@ -35,9 +43,27 @@ public class PNGStatusObject implements StatusObject {
 	}
 	@Override
 	public void finished() {
+		PolygonSimple rootPolygon = treemap.getRootPolygon();
+		Rectangle rootRect = rootPolygon.getBounds();
+		Graphics2D g;
+		
+		BufferedImage bufferImage = new BufferedImage(rootRect.width+2*border, rootRect.height+2*border,
+					BufferedImage.TYPE_INT_ARGB);
+		
+		g = bufferImage.createGraphics();
 		VoroRenderer renderer=new VoroRenderer();
 		renderer.setTreemap(treemap);
-		renderer.renderTreemap(filename);
+		g.translate(border, border);
+		renderer.setGraphics2D(g);		
+		renderer.renderTreemap(null);
+		
+		
+			try {
+				ImageIO.write(bufferImage, "png", new File(filename + ".png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	
 	}
 
 	@Override

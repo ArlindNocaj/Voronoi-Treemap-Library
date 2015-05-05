@@ -68,7 +68,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	private boolean initialized = false;
 
 	private boolean useBorder = false;
-	private boolean considerWeights=false;
+	private boolean uniformWeights=false;
 	private double shrinkPercentage = 1;
 	private boolean showLeafs = false;
 
@@ -810,7 +810,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 			for(Integer id:idToNode.keySet()){
 				VoroNode voroNode = idToNode.get(id);
 				Node node = treeData.nodeAtt.get(id);
-				if(considerWeights)
+				if(!getUniFormWeights())
 					voroNode.setWeight(node.weight);
 				voroNode.setName(node.name);
 			}
@@ -825,5 +825,13 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public boolean getUniFormWeights() {
+		return uniformWeights;
+	}
+
+	public void setUniformWeights(boolean considerWeights) {
+		this.uniformWeights = considerWeights;
 	}
 }

@@ -125,6 +125,7 @@ public class MainClass {
 			    			treemap.setNumberMaxIterations(2000);
 			    			treemap.setCancelOnThreshold(true);
 			    			treemap.setErrorAreaThreshold(0.02);
+			    			treemap.setUniformWeights(false);
 			    			
 			    			treemap.setNumberThreads(8);			    						    			
 			    			

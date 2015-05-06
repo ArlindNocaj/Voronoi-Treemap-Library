@@ -67,30 +67,30 @@ public class MainClass {
 		    		 String option = args[i].substring(1);
 		    		 
 		    		 if (option.startsWith("i")){
-		    			 for (int k = i+1; k < args.length; k++) {
-		    			 if(args[k].startsWith("-")) continue;
-		    			 String filename=args[k];
-		    			 String name=new File(filename).getName();				    			 	 		    			 
+		    			for (int k = i+1; k < args.length; k++) {
+		    			if(args[k].startsWith("-")) continue;
+		    			String filename=args[k];
+		    			String name=new File(filename).getName();				    			 	 		    			 
 		    					    			 
-		    			 PolygonSimple rootPolygon = new PolygonSimple();
-		    				int width = 800;
-		    				int height = 500;
+		    			PolygonSimple rootPolygon = new PolygonSimple();
+		    				int width = (int) (400*1.9);
+		    				int height = (int)(600*1.9);
 		    				
-		    				int numPoints=8;
-		    				for (int j = 0; j < numPoints; j++) {
-								double angle=2.0*Math.PI*(j*1.0/numPoints);
-								double rotate=2.0*Math.PI/numPoints/2;
-		    					double y=Math.sin(angle+rotate)*height+height;
-		    					double x=Math.cos(angle+rotate)*width+width;
-		    					rootPolygon.add(x,y);
-							}
+		    				int numPoints=12;
+//		    			for (int j = 0; j < numPoints; j++) {
+//								double angle=2.0*Math.PI*(j*1.0/numPoints);
+//								double rotate=2.0*Math.PI/numPoints/2;
+//		    					double y=Math.sin(angle+rotate)*height+height;
+//		    					double x=Math.cos(angle+rotate)*width+width;
+//		    					rootPolygon.add(x,y);
+//							}
 		
 	
 		    				
-//		    				rootPolygon.add(0, 0);
-//		    				rootPolygon.add(width, 0);
-//		    				rootPolygon.add(width, height);
-//		    				rootPolygon.add(0, height);
+		    				rootPolygon.add(0, 0);
+		    				rootPolygon.add(width, 0);
+		    				rootPolygon.add(width, height);
+		    				rootPolygon.add(0, height);
 
 		    				
 		    				
@@ -101,8 +101,8 @@ public class MainClass {
 			    			treemap.setCancelOnMaxIteration(true);
 			    			treemap.setNumberMaxIterations(2000);
 			    			treemap.setCancelOnThreshold(true);
-			    			treemap.setErrorAreaThreshold(0.02);
-			    			treemap.setUniformWeights(false);
+			    			treemap.setErrorAreaThreshold(0.05);
+			    			treemap.setUniformWeights(true);
 			    			
 			    			treemap.setNumberThreads(8);			    						    			
 			    			

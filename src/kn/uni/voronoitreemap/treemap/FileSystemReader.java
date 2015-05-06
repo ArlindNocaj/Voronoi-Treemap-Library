@@ -52,7 +52,9 @@ public class FileSystemReader {
 	}
 
 	public static void main(String args[]) {
-		FileSystemReader reader = new FileSystemReader("/home/nocaj/workspace2014/visone2/src/de");
+//		FileSystemReader reader = new FileSystemReader("/home/nocaj/workspace2014/visone2/src/de");
+		FileSystemReader reader = new FileSystemReader("/home/nocaj/git/linux");
+		
 		reader.createTreeFile();
 
 	}

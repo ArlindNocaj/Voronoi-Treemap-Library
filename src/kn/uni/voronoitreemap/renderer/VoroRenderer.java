@@ -188,7 +188,7 @@ public class VoroRenderer {
 			PolygonSimple poly = child.getPolygon();
 //			Color col = grayScale.getColorLinear(child.getHeight());
 			Color col = grayGetBrighter.getColorLinear(child.getHeight());
-			double width = 7* (1.0 / (child.getHeight()*child.getHeight()));
+			double width = 5* (1.0 / (child.getHeight()*child.getHeight()));
 			g.setStroke(new BasicStroke((int) width));
 			g.setColor(col);
 					
@@ -260,7 +260,7 @@ if(filename!=null){
 	
 	
 	private void drawName(VoroNode child, Graphics2D g) {
-		if(child.getHeight()>2) return;
+		if(child.getHeight()>4) return;
 //		if(child.getHeight()>2) continue;
 ////		if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
 		

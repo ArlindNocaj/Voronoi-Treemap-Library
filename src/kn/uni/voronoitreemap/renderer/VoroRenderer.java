@@ -313,8 +313,8 @@ if(filename!=null){
 		float nextTry = 200.0f;
 		Font font = pFont;
 		Point2D center = poly.getCentroid();
-//		int x=0;
-		while (true) {
+		int count=0;
+		while (true && count++<100) {
 			font = g.getFont().deriveFont(nextTry);
 			FontMetrics fm = g.getFontMetrics(font);
 			Rectangle2D bounds = fm.getStringBounds(text, g);
@@ -326,9 +326,10 @@ if(filename!=null){
 			if (poly.contains(rect))
 				// if(width <= rect.width)
 				return font;
+			
 			nextTry *= .9;
 		}
-//		return null;
+		return font;
 	}
 
 }

@@ -47,6 +47,7 @@ public class PDFStatusObject implements StatusObject {
 
 	@Override
 	public void finished() {
+		
 		PolygonSimple rootPolygon = treemap.getRootPolygon();
 		Rectangle rootRect = rootPolygon.getBounds();
 		PDFGraphics2D g;
@@ -65,6 +66,7 @@ public class PDFStatusObject implements StatusObject {
 		FileOutputStream file = null;		
 		try {
 			file = new FileOutputStream(filename + ".pdf");
+			
 			file.write(g.getBytes());
 			file.close();
 		} catch (Exception e) {

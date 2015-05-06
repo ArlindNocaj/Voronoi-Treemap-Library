@@ -35,6 +35,7 @@ public class PNGStatusObject implements StatusObject {
 	int border=10;
 	private String filename;
 	private VoronoiTreemap treemap;
+	private BufferedImage bufferImage;
 
 	public PNGStatusObject(String filename, VoronoiTreemap treemap){
 		this.filename=filename;
@@ -47,7 +48,7 @@ public class PNGStatusObject implements StatusObject {
 		Rectangle rootRect = rootPolygon.getBounds();
 		Graphics2D g;
 		
-		BufferedImage bufferImage = new BufferedImage(rootRect.width+2*border, rootRect.height+2*border,
+		this.bufferImage = new BufferedImage(rootRect.width+2*border, rootRect.height+2*border,
 					BufferedImage.TYPE_INT_ARGB);
 		
 		g = bufferImage.createGraphics();

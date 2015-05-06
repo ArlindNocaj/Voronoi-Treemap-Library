@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import kn.uni.voronoitreemap.IO.IO;
+import kn.uni.voronoitreemap.IO.PDFStatusObject;
 import kn.uni.voronoitreemap.IO.PNGStatusObject;
 import kn.uni.voronoitreemap.IO.WriteStatusObject;
 import kn.uni.voronoitreemap.core.VoronoiCore;
@@ -101,12 +102,13 @@ public class MainClass {
 			    			treemap.setNumberMaxIterations(2000);
 			    			treemap.setCancelOnThreshold(true);
 			    			treemap.setErrorAreaThreshold(0.02);
-			    			treemap.setUniformWeights(true);
+			    			treemap.setUniformWeights(false);
 			    			
 			    			treemap.setNumberThreads(8);			    						    			
 			    			
 //			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt")));
-			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), (VoronoiTreemap) treemap));
+			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), treemap));
+//			    			treemap.setStatusObject(new PDFStatusObject(getFileName(name, "pdf"), treemap));
 			    			treemap.computeLocked();		    			
 		    		 }
 		    		 }

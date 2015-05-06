@@ -1,3 +1,5 @@
+This is the old readme, needs to be rewritten completely!!
+
 Java Voronoi Treemap Library
 =====================
 

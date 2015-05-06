@@ -130,7 +130,9 @@ public class VoroRenderer {
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 		//
-		InterpolColor colRed=new InterpolColor(0, maxHeight+1, 342/360.0, 0.0, 1.0, 342/360.0, 0.6, 0.40);
+		int hue=342;
+//		hue=180;
+		InterpolColor colRed=new InterpolColor(0, maxHeight+1, hue/360.0, 0.0, 1.0, hue/360.0, 0.6, 0.40);
 		// draw polygon border
 		InterpolColor grayGetDarker = new InterpolColor(0, maxHeight, 0, 0, 0.5, 0,
 				0, 1.0);

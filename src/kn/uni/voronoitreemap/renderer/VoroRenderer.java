@@ -137,8 +137,10 @@ public class VoroRenderer {
 		InterpolColor grayGetDarker = new InterpolColor(0, maxHeight, 0, 0, 0.5, 0,
 				0, 1.0);
 
-		InterpolColor grayGetBrighter = new InterpolColor(1, maxHeight, 0, 0, 1.0, 0,
-				0, 0.9);
+//		InterpolColor grayGetBrighter = new InterpolColor(1, maxHeight, 0, 0, 1.0, 0,
+//				0, 0.9); //white border
+		InterpolColor grayGetBrighter = new InterpolColor(1, maxHeight, 0, 0, 0.4, 0,
+				0, 0.6);
 		
 		Random rand=new Random(1);
 		
@@ -177,6 +179,7 @@ public class VoroRenderer {
 			
 			g.setColor(Color.DARK_GRAY);
 			Color textCol = grayGetDarker.getColorLinear(height, 180);
+			textCol=new Color(255,255,255,200);
 			g.setColor(textCol);
 			drawName(child, g);
 			
@@ -188,7 +191,7 @@ public class VoroRenderer {
 			PolygonSimple poly = child.getPolygon();
 //			Color col = grayScale.getColorLinear(child.getHeight());
 			Color col = grayGetBrighter.getColorLinear(child.getHeight());
-			double width = 5* (1.0 / (child.getHeight()*child.getHeight()));
+			double width = 5* (1.0 / (child.getHeight()*child.getHeight()*1.1));
 			g.setStroke(new BasicStroke((int) width));
 			g.setColor(col);
 					
@@ -260,10 +263,13 @@ if(filename!=null){
 	
 	
 	private void drawName(VoroNode child, Graphics2D g) {
-		if(child.getHeight()>4) return;
+		if(child.getHeight()>3) return;
 //		if(child.getHeight()>2) continue;
 ////		if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
 		
+		double percent=child.getPolygon().getArea()/treemap.getRootPolygon().getArea();
+		
+		if(percent<0.015) return;
 		
 		if(child.getParent().getChildren().size()==1) return;
 		

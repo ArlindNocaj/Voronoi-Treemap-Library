@@ -29,15 +29,24 @@ import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
 
 public class MainClass {		
 	
+	
+	
+	public static String getFileName(String name, String extension){
+		return getFileName(name, extension,"");
+	}
 	/**
 	 * Returns a file name
 	 * @param name
 	 * @param extension
 	 * @return
 	 */
-	public static String getFileName(String name, String extension){
+	public static String getFileName(String name, String extension, String suffix){
+		if(name.contains("."))
+			name=name.substring(0, name.lastIndexOf("."));//remove extension if there is one
 		
-		String fileName=name;
+		name+=suffix;
+		String fileName=name;		
+	
 		File file=new File(fileName+"."+extension);
 		int i=1;
 		while(file.exists()){
@@ -73,8 +82,11 @@ public class MainClass {
 		    			String name=new File(filename).getName();				    			 	 		    			 
 		    					    			 
 		    			PolygonSimple rootPolygon = new PolygonSimple();
-		    				int width = (int) (400*1.9);
-		    				int height = (int)(600*1.9);
+		    				int width = (int) (400*1.95);
+		    				int height = (int)(600*1.95);
+		    				
+//		    				width=600*2;
+//		    				height=400*2;
 		    				
 		    				int numPoints=12;
 //		    			for (int j = 0; j < numPoints; j++) {
@@ -99,14 +111,14 @@ public class MainClass {
 		    			   	treemap.setRootPolygon(rootPolygon);
 		    			   	treemap.readEdgeList(filename);			    			    					    			
 			    			treemap.setCancelOnMaxIteration(true);
-			    			treemap.setNumberMaxIterations(2000);
+			    			treemap.setNumberMaxIterations(3000);
 			    			treemap.setCancelOnThreshold(true);
-			    			treemap.setErrorAreaThreshold(0.05);
+			    			treemap.setErrorAreaThreshold(0.02);
 			    			treemap.setUniformWeights(true);
 			    			
-			    			treemap.setNumberThreads(8);			    						    			
+			    			treemap.setNumberThreads(1);			    						    			
 			    			
-//			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt")));
+//			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt","-finished"),treemap));
 			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), treemap));
 //			    			treemap.setStatusObject(new PDFStatusObject(getFileName(name, "pdf"), treemap));
 			    			treemap.computeLocked();		    			

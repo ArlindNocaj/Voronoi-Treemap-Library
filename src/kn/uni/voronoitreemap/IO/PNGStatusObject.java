@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
 import kn.uni.voronoitreemap.interfaces.StatusObject;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.renderer.VoroRenderer;
+import kn.uni.voronoitreemap.treemap.VoroNode;
 import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
 
 /**

@@ -16,9 +16,13 @@ package kn.uni.voronoitreemap.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 
 import kn.uni.voronoitreemap.interfaces.StatusObject;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
+import kn.uni.voronoitreemap.j2d.Site;
+import kn.uni.voronoitreemap.treemap.VoroNode;
+import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
 
 /**
  * Class to write the result of a Voronoi Treemap computation as list of nodes together with the polygon:
@@ -32,17 +36,26 @@ public class WriteStatusObject implements StatusObject {
 	private String filename;
 	
 	BufferedWriter writer;
-	public WriteStatusObject(String outputFile) {
-		this.filename=outputFile;
+
+	private VoronoiTreemap treemap;
+	
+	public WriteStatusObject(String outputFile, VoronoiTreemap treemap) {
+		this.filename=outputFile+".txt";
+		this.treemap=treemap;
+		
 		try {
 			writer=new BufferedWriter(new FileWriter(filename));
-		writer.write("parentID;hierarchyLevel;childID;polygonPoints x1;y2;x2;y2,...\n");			
+			String header="nodeId;parentID;name;weight;hierarchyLevel;sitePosX;sitePosY;siteWeight;polygonPoints x1,y2,x2,y2\n";
+		writer.write(header);			
 		} catch (IOException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 	}
 	@Override
 	public void finished() {
+		
+		writeTreemap();
+		
 		try{
 		writer.flush();
 		writer.close();
@@ -51,31 +64,92 @@ public class WriteStatusObject implements StatusObject {
 		}
 		
 	}
+	
+	/**
+	 * Not finished yet....
+	 */
+	private void writeTreemap(){
+		if (treemap==null)
+			return;
+		int wrote=0;
+		for(VoroNode voroNode:treemap.getIdToNode().values()){
+
+			if(voroNode.getParent()==null) continue;
+			VoroNode parent = voroNode.getParent();
+			Site site=voroNode.getSite();
+			if(site==null ) {
+				System.out.println("site null: "+voroNode.getName()+"\t level: "+voroNode.getHeight()+"\t parent: "+parent.getName());
+				continue;
+			}
+			wrote++;
+			StringBuilder builder=new StringBuilder();
+			builder.append(voroNode.getNodeID()+";"+parent.getNodeID()+";"+voroNode.name+";"+voroNode.getWeight()+";"+voroNode.getHeight()+";"+site.x+";"+site.y+";"+site.getWeight()+";");
+			
+			PolygonSimple polygon=voroNode.getPolygon();
+			if(polygon!=null){
+			double[] xPoints = polygon.getXPoints();
+			double[] yPoints = polygon.getYPoints();
+			
+			for (int j=0;j<polygon.length;j++){
+				String first=(j==0)?"":",";
+				builder.append(first+xPoints[j]+","+yPoints[j]);
+			}
+			}else
+				builder.append("0,0");
+			
+			try {
+				writer.write(builder.toString()+"\n");
+			}catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println("Wrote elements # "+wrote);
+		
+	
+		
+	}
 
 	@Override
-	public void finishedNode(int Node, int layer, int[] children,
+	synchronized public void finishedNode(int Node, int layer, int[] children,
 			PolygonSimple[] polygons) {
-		if (children==null)
-			return;
-		
-		for (int i=0;i<children.length;i++){
-				StringBuilder builder=new StringBuilder();
-				builder.append(Node+";"+layer+";"+children[i]);
-				PolygonSimple polygon=polygons[i];
-				if(polygon!=null){
-				double[] xPoints = polygon.getXPoints();
-				double[] yPoints = polygon.getYPoints();
-				for (int j=0;j<polygon.length;j++)
-					builder.append(";"+xPoints[j]+";"+yPoints[j]);				
-				}else
-					builder.append("0;0");
-				
-				try {
-					writer.write(builder.toString()+"\n");
-				}catch (IOException e) {
-					e.printStackTrace();
-				}
-		}
+//		if (children==null)
+//			return;
+//		HashMap<Integer, VoroNode> idToNode = treemap.getIdToNode();
+//		
+////		String header="nodeId;parentID;name;weight;hierarchyLevel;sitePosX;sitePosY;siteWeight;polygonPoints x1,y2,x2,y2\n";
+//		for (int i=0;i<children.length;i++){
+//			Integer nodeId=i;
+//			VoroNode voronode = idToNode.get(nodeId);
+//			if(voronode==null) {
+//				System.out.println("No voronode for: "+nodeId+"\t level: "+layer);
+//				continue;
+//			}
+//			Site site = voronode.getSite();
+//			if(site==null ) {
+//				System.out.println("site null: "+nodeId+"\t level: "+layer+"\t children: "+voronode.getChildren());
+//				continue;
+//			}
+//				StringBuilder builder=new StringBuilder();
+//				builder.append(children[i]+";"+Node+";"+voronode.name+";"+voronode.getWeight()+";"+layer+";"+site.x+";"+site.y+";"+site.getWeight()+";");
+//				PolygonSimple polygon=polygons[i];
+//				if(polygon!=null){
+//				double[] xPoints = polygon.getXPoints();
+//				double[] yPoints = polygon.getYPoints();
+//				
+//				for (int j=0;j<polygon.length;j++){
+//					String first=(j==0)?"":",";
+//					builder.append(first+xPoints[j]+","+yPoints[j]);
+//				}
+//				}else
+//					builder.append("0,0");
+//				
+//				try {
+//					writer.write(builder.toString()+"\n");
+//				}catch (IOException e) {
+//					e.printStackTrace();
+//				}
+//		}
 	}
 
 }

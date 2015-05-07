@@ -55,7 +55,7 @@ public class VoroNode implements VoroCellObject {
 	private Site site;
 	private double wantedPercentage=0;
 	private Point2D relativeVector;
-	private String name;
+	public String name;
 	
 	public VoroNode(int nodeID) {
 		this.nodeID = nodeID;

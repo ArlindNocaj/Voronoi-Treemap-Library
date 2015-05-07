@@ -188,6 +188,8 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 			int numLines=countLines(filename);
 			ArrayList<ArrayList<Integer>> treeAdj=new ArrayList<>(numLines);			
 
+			
+			
 			BufferedReader reader= new BufferedReader(new FileReader(filename));									
 			
 			HashMap<String, Integer> nameToId=new HashMap<String, Integer>(numLines);
@@ -214,6 +216,8 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 	
 				String[] strings = line.split(";");
 				String nodeName=strings[0];
+
+				
 				String parentName=strings[1];
 
 				Integer nodeId=nameToId.get(nodeName);				
@@ -223,7 +227,6 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 					ArrayList<Integer> adj = new ArrayList<Integer>();
 					adj.add(nodeId);
 					treeAdj.add(adj);
-					
 					
 				}
 				Integer parentId = nameToId.get(parentName);
@@ -235,8 +238,7 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 					treeAdj.add(adj);
 				}
 				
-				childSet.add(nodeId);
-									
+				childSet.add(nodeId);									
 				treeAdj.get(parentId).add(nodeId);
 				parent.put(nodeId, parentId);
 				nodeEntry.put(nodeId, strings);

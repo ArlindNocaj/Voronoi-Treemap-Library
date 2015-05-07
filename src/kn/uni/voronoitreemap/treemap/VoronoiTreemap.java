@@ -105,6 +105,10 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 
 	/** when a node is finished the status object is notified. **/
 
+	public HashMap<Integer,VoroNode> getIdToNode(){
+		return idToNode;
+	}
+	
 	public VoronoiTreemap(StatusObject statusObject) {
 		this();
 		this.statusObject.add(statusObject);
@@ -821,8 +825,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	public void readEdgeList(String file){
 		try {
 			TreeData data = IO.readEdgeList(file);
-			setTreeData(data);			
-		} catch (Exception e) {
+			setTreeData(data);
+			} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

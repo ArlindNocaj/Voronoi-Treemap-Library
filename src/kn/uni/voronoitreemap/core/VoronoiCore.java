@@ -173,8 +173,6 @@ public class VoronoiCore {
 		// adapt weights
 		adaptWeightsSimple(sites);
 		voroDiagram();	
-
-		
 		
 //		fixNoPolygonSites();
 //		fixWeightsIfDominated(sites);

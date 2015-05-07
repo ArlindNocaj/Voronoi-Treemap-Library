@@ -47,11 +47,13 @@ import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.j2d.Site;
 
 /**
- * Main Voronoi Treemap class implementing the Voronoi Treemap interface and maintaining the settings.
+ * Main Voronoi Treemap class implementing the Voronoi Treemap interface and
+ * maintaining the settings.
+ * 
  * @author nocaj
- *
+ * 
  */
-public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
+public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject {
 	/**
 	 * DEBUGGING
 	 */
@@ -68,22 +70,21 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	private boolean initialized = false;
 
 	private boolean useBorder = false;
-	private boolean uniformWeights=false;
+	private boolean uniformWeights = false;
 	private double shrinkPercentage = 1;
 	private boolean showLeafs = false;
 
 	private int numberThreads = 1;
 	protected VoroNode root;
 	private PolygonSimple rootPolygon;
-	
-	
+
 	int amountAllNodes = 0;
 	int alreadyDoneNodes = 0;
 
 	long timeStart;
 	long timeEnd;
 	private Semaphore lock = new Semaphore(1);
-	
+
 	/**
 	 * This queue handles the voronoi cells which have to be calculated.
 	 */
@@ -91,13 +92,13 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	private List<StatusObject> statusObject;
 
 	// used for randomization
-	long randomSeed=21;
+	long randomSeed = 21;
 	Random rand = new Random(randomSeed);
-	
-	private HashMap<Integer, VoroNode> idToNode;	
+
+	private HashMap<Integer, VoroNode> idToNode;
 	private ArrayList<Tuple3ID> relativePositions;
-	
-	VoroSettings coreSettings=new VoroSettings();
+
+	VoroSettings coreSettings = new VoroSettings();
 	private int[] levelsMaxIteration;
 	private Set<VoroCPU> runningThreads;
 	private int rootIndex;
@@ -105,10 +106,10 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 
 	/** when a node is finished the status object is notified. **/
 
-	public HashMap<Integer,VoroNode> getIdToNode(){
+	public HashMap<Integer, VoroNode> getIdToNode() {
 		return idToNode;
 	}
-	
+
 	public VoronoiTreemap(StatusObject statusObject) {
 		this();
 		this.statusObject.add(statusObject);
@@ -116,9 +117,9 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 
 	public VoronoiTreemap(StatusObject statusObject, boolean multiThreaded) {
 		this(statusObject);
-		
-		if (multiThreaded) 
-			setNumberThreads(Runtime.getRuntime().availableProcessors());		
+
+		if (multiThreaded)
+			setNumberThreads(Runtime.getRuntime().availableProcessors());
 	}
 
 	public VoronoiTreemap() {
@@ -145,15 +146,15 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 		initialized = false;
 		useBorder = false;
 		shrinkPercentage = 1;
-		showLeafs = false;		
+		showLeafs = false;
 		numberThreads = 1;
 		root = null;
 		rootPolygon = null;
-		if (cellQueue!=null)
+		if (cellQueue != null)
 			cellQueue.clear();
 		statusObject = new ArrayList<StatusObject>();
 		rand = new Random(randomSeed);
-		if (idToNode!=null)
+		if (idToNode != null)
 			idToNode.clear();
 		lock = new Semaphore(1);
 	}
@@ -167,11 +168,11 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 		}
 	}
 
-	private void startComputeThreads() { 
+	private void startComputeThreads() {
 		this.runningThreads = Collections
 				.newSetFromMap(new ConcurrentHashMap<VoroCPU, Boolean>());
-		for (int i = 0; i < getNumberThreads(); i++) 
-			new VoroCPU(cellQueue, this,runningThreads).start();		
+		for (int i = 0; i < getNumberThreads(); i++)
+			new VoroCPU(cellQueue, this, runningThreads).start();
 	}
 
 	/*
@@ -187,8 +188,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 		cellQueue.add(root);
 		startComputeThreads();
 	}
-	
-	public void computeLocked(){
+
+	public void computeLocked() {
 		try {
 			lock.acquire();
 		} catch (InterruptedException e) {
@@ -274,26 +275,24 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 		voronoiTreemap.compute();
 	}
 
-	
 	public void setRootIndex(int rootIndex) {
 		this.rootIndex = rootIndex;
 	}
 
-
 	private void setRelativePositions(ArrayList<Tuple3ID> relativePositions) {
-		if (relativePositions == null) {										
-			for (VoroNode voroNode : idToNode.values()) {				
+		if (relativePositions == null) {
+			for (VoroNode voroNode : idToNode.values()) {
 				double x = rand.nextDouble();
 				double y = rand.nextDouble();
 				voroNode.setRelativeVector(new Point2D(x, y));
 			}
 			return;
 		}
-		
+
 		setReferenceMap(relativePositions);
-		
+
 	}
-	
+
 	public void setReferenceMap(ArrayList<Tuple3ID> relativePositions) {
 		for (Tuple3ID tuple : relativePositions) {
 			VoroNode voroNode = null;
@@ -302,47 +301,35 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 
 				voroNode.setRelativeVector(new Point2D(tuple.valueX,
 						tuple.valueY));
-			} 	
-			else System.out.println("node id could not be found for setting reference position: "+tuple.id);
+			} else
+				System.out
+						.println("node id could not be found for setting reference position: "
+								+ tuple.id);
 		}
 	}
 
-	protected final VoroNode createVoroNode(
-			HashMap<Integer, VoroNode> idToNode,
-			final ArrayList<Integer> adjacencyLine) {
-		ArrayList<Integer> childList = adjacencyLine;
-		if (adjacencyLine == null) {
-			return null;
-		}
+	protected final void addChildren(HashMap<Integer, VoroNode> idToNode,
+			final ArrayList<ArrayList<Integer>> adjLists, int currentPos) {
+		ArrayList<Integer> childList = adjLists.get(currentPos);
+		if (childList == null || childList.size() == 1)
+			return;
+
 		Integer parentId = childList.get(0);
+		VoroNode voroParent = idToNode.get(parentId);
 
-		int numberChildren = 0;
+		// add children to parent
 
-		numberChildren = childList.size() - 1;
-
-		VoroNode voroNode = null;
-		voroNode = idToNode.get(parentId);
-		if (voroNode == null) {
-			voroNode = new VoroNode(parentId, numberChildren);
+		for (int i = 1; i < childList.size(); i++) {
+			Integer childId = childList.get(i);
+			VoroNode voroChild = idToNode.get(childId);
+			voroParent.addChild(voroChild);
+			voroChild.setParent(voroParent);
 		}
-
-		voroNode.setTreemap(this);
-		setSettingsToVoroNode(voroNode);
-
-		// create child nodes
-		if (numberChildren >= 1) {
-			for (int i = 1; i < (numberChildren + 1); i++) {
-				Integer childId = childList.get(i);
-				VoroNode voroChild = new VoroNode(childId);
-				idToNode.put(childId, voroChild);
-				voroNode.addChild(voroChild);
-				voroChild.setParent(voroNode);
-				voroNode.setTreemap(this);
-				setSettingsToVoroNode(voroNode);
-			}
+		
+		for (int i = 1; i < childList.size(); i++) {
+			Integer childId = childList.get(i);
+			addChildren(idToNode, adjLists, childId);
 		}
-
-		return voroNode;
 
 	}
 
@@ -493,8 +480,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 		// this.getLayeredPane().add(component, new Integer(height));
 		// }
 		// }
-		
-		for(StatusObject statusObject:this.statusObject)
+
+		for (StatusObject statusObject : this.statusObject)
 			statusObject.finished();
 		lock.release();
 
@@ -627,7 +614,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	 * @see treemap.voronoiTreemapInterface#setCancelOnThreshold(boolean)
 	 */
 	public void setCancelOnThreshold(boolean cancelOnThreshold) {
-		this.coreSettings.cancelAreaError= cancelOnThreshold;
+		this.coreSettings.cancelAreaError = cancelOnThreshold;
 	}
 
 	/*
@@ -664,8 +651,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	 */
 	public void setRootPolygon(PolygonSimple rootPolygon) {
 		this.rootPolygon = rootPolygon;
-		if(root!=null)
-		root.setPolygon(rootPolygon);
+		if (root != null)
+			root.setPolygon(rootPolygon);
 	}
 
 	/*
@@ -701,8 +688,6 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	public PolygonSimple getRootPolygon() {
 		return rootPolygon;
 	}
-
-
 
 	/*
 	 * (non-Javadoc)
@@ -754,22 +739,23 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 	@Override
 	public void finishedNode(int Node, int layer, int[] children,
 			PolygonSimple[] polygons) {
-		for(StatusObject statusObject:this.statusObject)			
+		for (StatusObject statusObject : this.statusObject)
 			statusObject.finishedNode(Node, layer, children, polygons);
 	}
 
 	public void setTree(ArrayList<ArrayList<Integer>> treeStructure) {
 		idToNode = new HashMap<Integer, VoroNode>();
 
-		ArrayList<Integer> line = treeStructure.get(rootIndex);
-		int numberLines = treeStructure.size();
-		
-		root = createVoroNode(idToNode, line);
-
-		for (int i = 0; i < numberLines; i++) {
-			if(i!=rootIndex)
-				createVoroNode(idToNode, treeStructure.get(i));
+		for (int i = 0; i < treeStructure.size(); i++) {
+			ArrayList<Integer> adj = treeStructure.get(i);
+			VoroNode node = new VoroNode(i, adj.size() - 1);
+			idToNode.put(i, node);
+			node.setTreemap(this);
 		}
+
+		root = idToNode.get(rootIndex);
+
+		addChildren(idToNode, treeStructure, rootIndex);
 
 		for (VoroNode voroNode : idToNode.values()) {
 			double x = rand.nextDouble();
@@ -777,56 +763,53 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 			voroNode.setRelativeVector(new Point2D(x, y));
 		}
 
-		root.setVoroPolygon(rootPolygon);	
+		root.setVoroPolygon(rootPolygon);
 	}
-	
+
 	public void clear() {
 		init();
 	}
 
 	public void setRandomSeed(long seed) {
-		randomSeed=seed;
+		randomSeed = seed;
 		rand.setSeed(seed);
 	}
-
 
 	public long getRandomSeed() {
 		return randomSeed;
 	}
 
-
 	public void setErrorAreaThreshold(double d) {
-		coreSettings.errorThreshold=d;
-		
+		coreSettings.errorThreshold = d;
+
 	}
 
 	public void setTreeData(TreeData treeData) {
-		this.treeData=treeData;
-		rootIndex=treeData.rootIndex;		
+		this.treeData = treeData;
+		rootIndex = treeData.rootIndex;
 
-		
-		setTree(treeData.tree);				
+		setTree(treeData.tree);
 		root.setVoroPolygon(rootPolygon);
-		
-		
-		//set names and weights
-		if(treeData!=null &&treeData.nodeAtt!=null){
-			for(Integer id:idToNode.keySet()){
+
+		// set names and weights
+		if (treeData != null && treeData.nodeAtt != null) {
+			for (Integer id : idToNode.keySet()) {
 				VoroNode voroNode = idToNode.get(id);
 				Node node = treeData.nodeAtt.get(id);
-				if(!getUniFormWeights())
+				if(node==null) continue;
+				if (!getUniFormWeights())
 					voroNode.setWeight(node.weight);
 				voroNode.setName(node.name);
 			}
 		}
-		
-	}	
-	
-	public void readEdgeList(String file){
+
+	}
+
+	public void readEdgeList(String file) {
 		try {
 			TreeData data = IO.readEdgeList(file);
 			setTreeData(data);
-			} catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -837,8 +820,8 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject{
 
 	public void setUniformWeights(boolean considerWeights) {
 		this.uniformWeights = considerWeights;
-		if(uniformWeights)
-			for(VoroNode node:idToNode.values())
-			node.setWeight(1.0);		
+		if (uniformWeights)
+			for (VoroNode node : idToNode.values())
+				node.setWeight(1.0);
 	}
 }

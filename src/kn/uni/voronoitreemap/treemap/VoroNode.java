@@ -412,7 +412,7 @@ public class VoroNode implements VoroCellObject {
 	// }
 
 	public void setTreemap(VoronoiTreemap treemap) {
-		this.treemap = treemap;
+		this.treemap = treemap;		
 	}
 
 	public VoronoiTreemap getTreemap() {

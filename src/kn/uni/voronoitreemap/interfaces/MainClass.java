@@ -118,7 +118,7 @@ public class MainClass {
 			    			
 			    			treemap.setNumberThreads(1);			    						    			
 			    			
-//			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt","-finished"),treemap));
+			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt","-finished"),treemap));
 			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), treemap));
 //			    			treemap.setStatusObject(new PDFStatusObject(getFileName(name, "pdf"), treemap));
 			    			treemap.computeLocked();		    			

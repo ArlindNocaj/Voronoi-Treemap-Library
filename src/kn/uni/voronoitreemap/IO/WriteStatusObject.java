@@ -25,9 +25,8 @@ import kn.uni.voronoitreemap.treemap.VoroNode;
 import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
 
 /**
- * Class to write the result of a Voronoi Treemap computation as list of nodes together with the polygon:
- * parentID;hierarchyLevel;childID;polygonPoints x1;y2;x2;y2,...\n
- * Useful for command line.
+ * Class to write the result of a Voronoi Treemap computation as an edge list, including polygons
+ * "nodeId;parentID;name;weight;hierarchyLevel;sitePosX;sitePosY;siteWeight;polygonPoints x1,y2,x2,y2\n";
  * @author Arlind Nocaj
  *
  */
@@ -65,9 +64,7 @@ public class WriteStatusObject implements StatusObject {
 		
 	}
 	
-	/**
-	 * Not finished yet....
-	 */
+
 	private void writeTreemap(){
 		if (treemap==null)
 			return;

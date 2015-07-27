@@ -31,9 +31,13 @@ public class FileSystemReader {
 	private String directory;
 	private BufferedWriter writer;
 
-	public FileSystemReader(String directory) {
+	public FileSystemReader(String directory) {		
+		if (directory.startsWith("~" + File.separator)) {
+			directory = System.getProperty("user.home") + directory.substring(1);
+		}
+		
 		this.directory = directory;
-		this.exportFile = "VT-" + new File(directory).getName() + ".txt";
+		this.setExportFile("VT-" + new File(directory).getName() + ".txt");
 	}
 
 	public void listDir(File dir, int parentId) throws IOException {
@@ -51,33 +55,34 @@ public class FileSystemReader {
 		}
 	}
 
-	public static void main(String args[]) {
-//		FileSystemReader reader = new FileSystemReader("/home/nocaj/workspace2014/visone2/src/de");
-		FileSystemReader reader = new FileSystemReader("/home/nocaj/git/linux");
-		
+	public static void main(String args[]) {		
+		FileSystemReader reader = new FileSystemReader("~/");		
 		reader.createTreeFile();
-
 	}
 
 	public String getLine(File file, int nodeId, int parentId) {
 		if (!file.exists())
 			return null;
 		// "nodeId,parrentId,name,size,createdDate,modifiedDate";
-		long length = 0;
+		double length = 0;
 		if (file.isFile())
 			length = file.length();
+		
+		length=Math.max(length, 1);
+		length=Math.log(length)+1;
+		System.out.println("length: "+length);
 		String line = nodeId + ";" + parentId + ";" + file.getName().replace(";", "") + ";"
 				+ length;
 		
 		return line;
 	}
 
-	private void createTreeFile() {
+	public void createTreeFile() {
 		try {
-			File expFile=new File(exportFile);
+			File expFile=new File(getExportFile());
 			if(expFile.exists()) expFile.delete();
 			
-			this.writer = new BufferedWriter(new FileWriter(exportFile));
+			this.writer = new BufferedWriter(new FileWriter(getExportFile()));
 			String header="nodeI;parentId;name;weight";
 			writer.write(header+"\n");
 			nodeCount = 0;
@@ -89,5 +94,13 @@ public class FileSystemReader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public String getExportFile() {
+		return exportFile;
+	}
+
+	public void setExportFile(String exportFile) {
+		this.exportFile = exportFile;
 	}
 }

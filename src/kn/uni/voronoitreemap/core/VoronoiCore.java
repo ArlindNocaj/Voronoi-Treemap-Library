@@ -56,28 +56,26 @@ public class VoronoiCore {
 	 * core variables
 	 */
 
-	private final boolean firstIteration = true;
+	private boolean firstIteration = true;
 	private static final double nearlyOne = 0.999;
 
 	/**
 	 * Settings for the Core
 	 */
-	VoroSettings settings=new VoroSettings();
-	
+	VoroSettings settings = new VoroSettings();
+
 	protected PolygonSimple clipPolygon;
-	protected OpenList sites;	
+	protected OpenList sites;
 	protected PowerDiagram diagram;
 	private int currentIteration;
 	protected double currentAreaError = 1.0;
-	
-	//level in the hierarchy, level=0 is the first layer
+
+	// level in the hierarchy, level=0 is the first layer
 	private int level;
 	private Point2D center;
 	private double scale;
 	private AffineTransform transform;
-	private double currentErrorMax ;
-	
-
+	private double currentErrorMax;
 
 	public OpenList getSiteList() {
 		return sites;
@@ -97,24 +95,27 @@ public class VoronoiCore {
 	/**
 	 * The resulting Voronoi cells are clipped with this polygon
 	 * 
-	 * @param polygon clipping polygon
+	 * @param polygon
+	 *            clipping polygon
 	 */
 	public void setClipPolygon(PolygonSimple polygon) {
-		clipPolygon = polygon;		
-		if (diagram != null) 
-			diagram.setClipPoly(polygon);		
+		clipPolygon = polygon;
+		if (diagram != null)
+			diagram.setClipPoly(polygon);
 	}
-	
+
 	/**
 	 * Returns clipping polygon
+	 * 
 	 * @return
 	 */
-	public PolygonSimple getClipPolyogon(){
+	public PolygonSimple getClipPolyogon() {
 		return clipPolygon;
 	}
 
 	/**
 	 * Sets a rectangle as clipping polygon.
+	 * 
 	 * @param rectangle
 	 */
 	public void setClipPolygon(Rectangle2D rectangle) {
@@ -127,7 +128,7 @@ public class VoronoiCore {
 	}
 
 	private void init() {
-		diagram = new PowerDiagram();		
+		diagram = new PowerDiagram();
 	}
 
 	public VoronoiCore() {
@@ -141,14 +142,14 @@ public class VoronoiCore {
 	}
 
 	public VoronoiCore(PolygonSimple clipPolygon) {
-		this();		
-		setClipPolygon(clipPolygon);		
+		this();
+		setClipPolygon(clipPolygon);
 	}
 
 	public VoronoiCore(OpenList sites, PolygonSimple clipPolygon) {
 		this();
 		this.sites = sites;
-		setClipPolygon(clipPolygon);		
+		setClipPolygon(clipPolygon);
 	}
 
 	/**
@@ -160,69 +161,66 @@ public class VoronoiCore {
 		sites.add(site);
 	}
 
-	
 	public void iterateSimple() {
-//		if(currentIteration<=settings.maxIterat){
-		 moveSites(sites);
-	     checkPointsInPolygon(sites);
-//		}
-	     	
-//	    voroDiagram();//does not seem to be necessary
-//	     	    fixNoPolygonSites();
+		// if(currentIteration<=settings.maxIterat){
+		moveSites(sites);
+		checkPointsInPolygon(sites);
+		// }
+
+		// voroDiagram();//does not seem to be necessary
+		// fixNoPolygonSites();
 
 		// adapt weights
 		adaptWeightsSimple(sites);
-		voroDiagram();	
-		
-//		fixNoPolygonSites();
-//		fixWeightsIfDominated(sites);
-		 if(frame!=null)frame.repaintWithWait(4);
+		voroDiagram();
+
+		// fixNoPolygonSites();
+		// fixWeightsIfDominated(sites);
+		if (frame != null)
+			frame.repaintWithWait(4);
 		currentAreaError = computeAreaError(sites);
-		currentErrorMax=computeMaxError(sites);
+		currentErrorMax = computeMaxError(sites);
 		currentIteration++;
 	}
 
-	
-
 	private void fixNoPolygonSites() {
-		for(Site a:sites){
-	    	 if(a.getPolygon()==null){
-	    		 fixWeightsIfDominated(sites);
-	    		 voroDiagram();
-	    		 break;
-	    	 }	    	 
-	     }
+		for (Site a : sites) {
+			if (a.getPolygon() == null) {
+				fixWeightsIfDominated(sites);
+				voroDiagram();
+				break;
+			}
+		}
 	}
-	
-	
-	public boolean checkBadResult(OpenList sites){
-	    for(Site a:sites){
-	    	 if(a.getPolygon()==null)
-	    		 return true;
-	    	 
-//	    	 assert clipPolygon.contains(a.getPolygon().getCentroid());	    	 
-	    	 
-	    }		 
-	     
+
+	public boolean checkBadResult(OpenList sites) {
+		for (Site a : sites) {
+			if (a.getPolygon() == null)
+				return true;
+
+			// assert clipPolygon.contains(a.getPolygon().getCentroid());
+
+		}
+
 		return false;
 	}
-	
+
 	private void checkPointsInPolygon(OpenList sites) {
-		boolean outside=false;
+		boolean outside = false;
 		for (int i = 0; i < sites.size; i++) {
 			Site point = sites.array[i];
 			if (!clipPolygon.contains(point.x, point.y)) {
-				outside=true;
+				outside = true;
 				Point2D p = clipPolygon.getInnerPoint();
 				point.setXY(p.x, p.y);
 			}
 		}
-		if(outside)		
-		fixWeightsIfDominated(sites);
+		if (outside)
+			fixWeightsIfDominated(sites);
 	}
 
 	private double computeAreaError(OpenList sites) {
-		double completeArea=clipPolygon.getArea();
+		double completeArea = clipPolygon.getArea();
 		double errorArea = 0;
 		for (int z = 0; z < sites.size; z++) {
 			Site point = sites.array[z];
@@ -234,120 +232,115 @@ public class VoronoiCore {
 		}
 		return errorArea;
 	}
-	
+
 	private double computeMaxError(OpenList sites2) {
-		double completeArea=clipPolygon.getArea();
+		double completeArea = clipPolygon.getArea();
 		double maxError = 0;
 		for (int z = 0; z < sites.size; z++) {
 			Site point = sites.array[z];
 			PolygonSimple poly = point.getPolygon();
 			double currentArea = (poly == null) ? 0.0 : poly.getArea();
 			double wantedArea = completeArea * point.getPercentage();
-			double error = Math.abs(wantedArea - currentArea)
-					/ (wantedArea);
-			maxError=Math.max(error, maxError);
+			double error = Math.abs(wantedArea - currentArea) / (wantedArea);
+			maxError = Math.max(error, maxError);
 		}
 		return maxError;
 	}
 
-	private void moveSites(OpenList sites) {		
-		for (Site point:sites){
+	private void moveSites(OpenList sites) {
+		for (Site point : sites) {
 			PolygonSimple poly = point.getPolygon();
 			if (poly != null) {
 				Point2D centroid = poly.getCentroid();
 				double centroidX = centroid.getX();
 				double centroidY = centroid.getY();
-				if(clipPolygon.contains(centroidX, centroidY))
-					point.setXY(centroidX, centroidY);							
+				if (clipPolygon.contains(centroidX, centroidY))
+					point.setXY(centroidX, centroidY);
 			}
 		}
 	}
-	
-	
 
-	private void adjustWeightsToBePositive(OpenList sites) {			
-			double minWeight = 0;
-			for (int z = 0; z < sites.size; z++) {
-				Site s = sites.array[z];
-				if (s.getWeight() < minWeight)
-					minWeight = s.getWeight();
-			}
-			
+	private void adjustWeightsToBePositive(OpenList sites) {
+		double minWeight = 0;
+		for (int z = 0; z < sites.size; z++) {
+			Site s = sites.array[z];
+			if (s.getWeight() < minWeight)
+				minWeight = s.getWeight();
+		}
 
-			for (int z = 0; z < sites.size; z++) {
-				Site s = sites.array[z];
-				double w = s.getWeight();
-				if (Double.isNaN(w))
-					w = 0.0001;
-				w -= minWeight;
-				if (w < 0.0001)
-					w = 0.0001;				
-				s.setWeight(w);
-			}
-		
+		for (int z = 0; z < sites.size; z++) {
+			Site s = sites.array[z];
+			double w = s.getWeight();
+			if (Double.isNaN(w))
+				w = 0.0001;
+			w -= minWeight;
+			if (w < 0.0001)
+				w = 0.0001;
+			s.setWeight(w);
+		}
+
 	}
 
-	
 	private void adaptWeightsSimple(OpenList sites) {
 		Site[] array = sites.array;
 		int size = sites.size;
-		Random rand=new Random(5);
-		double averageDistance=getGlobalAvgNeighbourDistance(sites);
-//		double averageWeight=getAvgWeight(sites);
-//		averageDistance+=averageWeight;
+		Random rand = new Random(5);
+		double averageDistance = getGlobalAvgNeighbourDistance(sites);
+		// double averageWeight=getAvgWeight(sites);
+		// averageDistance+=averageWeight;
 		double error = computeAreaError(sites);
 		for (int z = 0; z < size; z++) {
 			Site point = array[z];
 			PolygonSimple poly = point.getPolygon();
-			
-//			if(poly==null) 
-//				System.out.println(point.getWeight()+"\t"+error);
+
+			// if(poly==null)
+			// System.out.println(point.getWeight()+"\t"+error);
 			double completeArea = clipPolygon.getArea();
-			double currentArea = (poly == null) ? 0.0 : poly.getArea();	
+			double currentArea = (poly == null) ? 0.0 : poly.getArea();
 			double wantedArea = completeArea * point.getPercentage();
-			
-			double increase = wantedArea / currentArea;			
-			if(currentArea==0.0)
-				increase=2.0;
-			
-			double weight=point.getWeight();
-	
-			double step=0;
-			double errorTransform=(-(error-1)*(error-1)+1);
-			
-//			errorTransform=error;
-//			errorTransform=Math.max(errorTransform, settings.errorThreshold);			
-//			if(currentIteration>settings.maxIterat) errorTransform*=rand.nextDouble();
-			
-			step=1.0*averageDistance*errorTransform;
-//			step=2*averageDistance*error;
+
+			double increase = wantedArea / currentArea;
+			if (currentArea == 0.0)
+				increase = 2.0;
+
+			double weight = point.getWeight();
+
+			double step = 0;
+			double errorTransform = (-(error - 1) * (error - 1) + 1);
+
+			// errorTransform=error;
+			// errorTransform=Math.max(errorTransform, settings.errorThreshold);
+			// if(currentIteration>settings.maxIterat)
+			// errorTransform*=rand.nextDouble();
+
+			step = 1.0 * averageDistance * errorTransform;
+			// step=2*averageDistance*error;
 			double epsilon = 0.01;
-			if(increase<(1.0-epsilon))
-				weight-=step;
-			else if (increase>(1.0+epsilon)) weight+=step;
-				point.setWeight(weight);
+			if (increase < (1.0 - epsilon))
+				weight -= step;
+			else if (increase > (1.0 + epsilon))
+				weight += step;
+			point.setWeight(weight);
 
-
-			//debug purpose
+			// debug purpose
 			point.setLastIncrease(increase);
 
 		}
 	}
-	
 
 	private void fixWeightsIfDominated(OpenList sites) {
 
-		for(Site s:sites){
-			double weight=s.getWeight();
-			if(Double.isNaN(weight)){
+		for (Site s : sites) {
+			double weight = s.getWeight();
+			if (Double.isNaN(weight)) {
 				s.setWeight(0.00000000001);
 			}
 		}
-		
-		for(Site s:sites){
-			for(Site q:sites){
-				if(s!=q){
-					double distance = s.distance(q)*nearlyOne;
+
+		for (Site s : sites) {
+			for (Site q : sites) {
+				if (s != q) {
+					double distance = s.distance(q) * nearlyOne;
 					if (Math.sqrt(s.getWeight()) >= distance) {
 						double weight = distance * distance;
 						q.setWeight(weight);
@@ -357,41 +350,40 @@ public class VoronoiCore {
 		}
 	}
 
-	
 	private void fixWeightsIfDominated2(OpenList sites) {
 
-		//get all nearest neighbors
+		// get all nearest neighbors
 		OpenList copy = sites.cloneWithZeroWeights();
-		for(Site s:sites) if(Double.isNaN(s.getWeight())) System.out.println(s);
-		PowerDiagram diagram=new PowerDiagram(sites,sites.getBoundsPolygon(20));
+		for (Site s : sites)
+			if (Double.isNaN(s.getWeight()))
+				System.out.println(s);
+		PowerDiagram diagram = new PowerDiagram(sites,
+				sites.getBoundsPolygon(20));
 		diagram.computeDiagram();
-		
-		//set pointer to original site
-		for (int z = 0; z < sites.size; z++) 
+
+		// set pointer to original site
+		for (int z = 0; z < sites.size; z++)
 			copy.array[z].setData(sites.array[z]);
-					
+
 		for (int z = 0; z < copy.size; z++) {
-			Site pointCopy = copy.array[z];			
-			Site point=sites.array[z];
-			if(pointCopy.getNeighbours()!=null)
-			for(Site neighbor:pointCopy.getNeighbours()){
-				Site original=(Site) neighbor.getData();
-				if(original.getPolygon()==null){
-					double dist=pointCopy.distance(neighbor)*nearlyOne;					
-					if (Math.sqrt(pointCopy.getWeight()) > dist) {
-						double weight = dist * dist;
-						point.setWeight(weight);
+			Site pointCopy = copy.array[z];
+			Site point = sites.array[z];
+			if (pointCopy.getNeighbours() != null)
+				for (Site neighbor : pointCopy.getNeighbours()) {
+					Site original = (Site) neighbor.getData();
+					if (original.getPolygon() == null) {
+						double dist = pointCopy.distance(neighbor) * nearlyOne;
+						if (Math.sqrt(pointCopy.getWeight()) > dist) {
+							double weight = dist * dist;
+							point.setWeight(weight);
+						}
 					}
 				}
-			}			
 
 		}
 
 	}
 
-	
-
-	
 	/**
 	 * Computes the minimal distance to the voronoi Diagram neighbours
 	 */
@@ -405,37 +397,37 @@ public class VoronoiCore {
 		}
 		return minDistance;
 	}
-	
+
 	private double getAvgNeighbourDistance(Site point) {
 		double avg = 0;
 		for (Site neighbour : point.getNeighbours()) {
 			double distance = neighbour.distance(point);
-			avg+=distance;
+			avg += distance;
 		}
-		avg/=point.getNeighbours().size();
+		avg /= point.getNeighbours().size();
 		return avg;
 	}
-	
+
 	private double getAvgWeight(OpenList sites) {
 		double avg = 0;
-		int num=sites.size;
-		for(Site point:sites)
-			avg+=point.getWeight();			
-		avg/=num;
+		int num = sites.size;
+		for (Site point : sites)
+			avg += point.getWeight();
+		avg /= num;
 		return avg;
 	}
-	
+
 	private double getGlobalAvgNeighbourDistance(OpenList sites) {
 		double avg = 0;
-		int num=0;
-		for(Site point:sites)
-			if(point.getNeighbours()!=null)
-		for (Site neighbour : point.getNeighbours()) {
-			double distance = neighbour.distance(point);
-			avg+=distance;
-			num++;
-		}
-		avg/=num;
+		int num = 0;
+		for (Site point : sites)
+			if (point.getNeighbours() != null)
+				for (Site neighbour : point.getNeighbours()) {
+					double distance = neighbour.distance(point);
+					avg += distance;
+					num++;
+				}
+		avg /= num;
 		return avg;
 	}
 
@@ -455,70 +447,69 @@ public class VoronoiCore {
 	 * Computes the diagram and sets the results
 	 */
 	public synchronized void voroDiagram() {
-		boolean worked=false;
-		while(!worked){
-		try {
-			PowerDiagram diagram=new PowerDiagram();
-			diagram.setSites(sites);
-			diagram.setClipPoly(clipPolygon);
-			diagram.computeDiagram();
-			worked=true;
-		} catch (Exception e) {			
-			
-			System.out.println("Error on computing power diagram, fixing by randomization");
-//			e.printStackTrace();		
+		boolean worked = false;
+		while (!worked) {
+			try {
+				PowerDiagram diagram = new PowerDiagram();
+				diagram.setSites(sites);
+				diagram.setClipPoly(clipPolygon);
+				diagram.computeDiagram();
+				worked = true;
+			} catch (Exception e) {
 
-				
-			
-			randomizePoints(sites);
-			adjustWeightsToBePositive(sites);
-			fixWeightsIfDominated(sites);			
-		}
+				System.out
+						.println("Error on computing power diagram, fixing by randomization");
+				// e.printStackTrace();
+
+				randomizePoints(sites);
+				adjustWeightsToBePositive(sites);
+				fixWeightsIfDominated(sites);
+			}
 		}
 	}
 
-	
-	public void printCoreCode(){
+	public void printCoreCode() {
 		printPolygonCode(clipPolygon);
-		
-   System.out.println("OpenList list=new OpenList("+sites.size+");");
+
+		System.out.println("OpenList list=new OpenList(" + sites.size + ");");
 		for (int i = 0; i < sites.size; i++) {
 			Site s = sites.array[i];
-			String line="list.add(new Site("+s.x+","+s.y+","+s.getWeight()+"));";
+			String line = "list.add(new Site(" + s.x + "," + s.y + ","
+					+ s.getWeight() + "));";
 			System.out.println(line);
 		}
-		
-			
+
 	}
+
 	public static void printPolygonCode(PolygonSimple poly) {
 		double[] x = poly.getXPoints();
 		double[] y = poly.getYPoints();
 		System.out.println("PolygonSimple poly=new PolygonSimple();");
-		
-		for (int i = 0; i < poly.getNumPoints(); i++) {				
-		String line="poly.add("+x[i]+","+y[i]+");";
-		System.out.println(line);
+
+		for (int i = 0; i < poly.getNumPoints(); i++) {
+			String line = "poly.add(" + x[i] + "," + y[i] + ");";
+			System.out.println(line);
 		}
 	}
 
 	private void randomizePoints(OpenList sites) {
-		
-//		double dist=getGlobalAvgNeighbourDistance(sites);
-		for (int i= 0; i < sites.size; i++) {
-			Site point = sites.array[i];			
-			if(!clipPolygon.contains(point.x,point.y)){
+
+		// double dist=getGlobalAvgNeighbourDistance(sites);
+		for (int i = 0; i < sites.size; i++) {
+			Site point = sites.array[i];
+			if (!clipPolygon.contains(point.x, point.y)) {
 				Point2D p = clipPolygon.getInnerPoint();
-				point.setXY(p.x,p.y);
+				point.setXY(p.x, p.y);
 				continue;
 			}
-//			double x=0;
-//			double y=0;
-//			do{
-//				x=rand.nextDouble()-dist*1E-6;
-//				y=rand.nextDouble()-dist*1E-6;	
-//			}while(!clipPolygon.contains(point.x+x,point.y+y));
-//			point.setXY(x, y);
-			
+			// double x=0;
+			// double y=0;
+			// do{
+			// x=rand.nextDouble()-dist*1E-6;
+			// y=rand.nextDouble()-dist*1E-6;
+			// }while(!clipPolygon.contains(point.x+x,point.y+y));
+			// point.setXY(x, y);
+
 		}
 	}
 
@@ -535,63 +526,62 @@ public class VoronoiCore {
 			System.out.println("Error on computing power diagram");
 			e.printStackTrace();
 		}
-	}	
+	}
 
 	public void doIterate() {
-		if(sites.size<=1) return;
-		sites.array[0].setPolygon(clipPolygon.clone());
-				
-		shiftAndScaleZeroCenter();		
-		
-		if(frame!=null)frame.setVoroCore(this);//debug mode
-		
+		if (sites.size <= 1) {
+			sites.array[0].setPolygon(clipPolygon.clone());
+			return;
+		}
+
+		shiftAndScaleZeroCenter();
+
+		if (frame != null)
+			frame.setVoroCore(this);// debug mode
+
 		// solveDuplicates(this.sites);
 		currentIteration = 0;
 		currentAreaError = 1.0;
 
-		// if there is just one side we don't have to do anything
-		if (sites.size == 1) {
-			PolygonSimple p = (PolygonSimple) clipPolygon.clone();
-			sites.array[0].setPolygon(p);
-			return;
-		}		
 		checkPointsInPolygon(sites);
-		if (firstIteration) 
+		if (firstIteration){
+			firstIteration=false;
 			voroDiagram();
+		}
 
-		boolean badResult=true;
-		while(true){
-			iterateSimple();			
-			badResult=checkBadResult(sites);
+		boolean badResult = true;
+		while (true) {
+			iterateSimple();
+			badResult = checkBadResult(sites);
 
-			if(!badResult){
-			if (settings.cancelAreaError
-						&& currentAreaError < settings.errorThreshold && (!settings.cancelOnLocalError || currentErrorMax<settings.errorThreshold)) 
-				break;
-			
-			if (settings.cancelMaxIterat && currentIteration>settings.maxIterat)
-				break;			
+			if (!badResult) {
+				if (settings.cancelAreaError
+						&& currentAreaError < settings.errorThreshold
+						&& (!settings.cancelOnLocalError || currentErrorMax < settings.errorThreshold))
+					break;
+
+				if (settings.cancelMaxIterat
+						&& currentIteration > settings.maxIterat)
+					break;
 			}
 
-//			 System.out.println("Iter: " + currentIteration
-//			 + "\t AreaError: \t" + lastAreaError);			
-			if(frame!=null)frame.repaintWithWait(4);
+			// System.out.println("Iter: " + currentIteration
+			// + "\t AreaError: \t" + lastAreaError);
+			if (frame != null)
+				frame.repaintWithWait(4);
 		}
-		
+
 		transformBackFromZero();
-		transform=null;
-		
-		scale=1.0;
-		center.x=0;
-		center.y=0;
+		transform = null;
+
 		
 		System.out.println("Iteration: " + currentIteration
 				+ "\t AreaError: \t" + currentAreaError);
-		System.out.println("Iteration: " + currentIteration
-				+ "\t MaxError: \t" + currentErrorMax);
-				
-		// now its finish so give the cells a hint
-		for (Site site:sites) {
+		System.out.println("Iteration: " + currentIteration + "\t MaxError: \t"
+				+ currentErrorMax);
+
+		// now its finished so give the cells a hint
+		for (Site site : sites) {
 			PolygonSimple poly = site.getPolygon();
 			if (site.cellObject != null) {
 				site.cellObject.setVoroPolygon(poly);
@@ -600,125 +590,93 @@ public class VoronoiCore {
 		}
 	}
 
+	/**
+	 * Scaling and Shifting allows for higher geometry precision
+	 */
 	private void shiftAndScaleZeroCenter() {
-		
+
 		PolygonSimple poly = clipPolygon;
-		 this.center= poly.getCentroid();
-		 Rectangle2D bounds = poly.getBounds2D();
-		 double width=Math.max(bounds.getWidth(), bounds.getHeight());
-		 double goalWidth=500.0;
-		 
-		 this.scale=goalWidth/width;
-		 
-		 
-		 this.transform=new AffineTransform();
-		 
-		 transform.scale(scale, scale);
-		 transform.translate(-center.x, -center.y);
-		 
-		 poly.translate(-center.x, -center.y);
-		 poly.scale(scale);
-		
-		 PolygonSimple copy = poly.getOriginalPolygon();
-		 if(copy!=null){
-		 copy.translate(-center.x, -center.y);
-		 copy.scale(scale);
-		 }
-		 				
+		this.center = poly.getCentroid();
+		Rectangle2D bounds = poly.getBounds2D();
+		double width = Math.max(bounds.getWidth(), bounds.getHeight());
+		double goalWidth = 500.0;
+
+		this.scale = goalWidth / width;
+
+		this.transform = new AffineTransform();
+
+		transform.scale(scale, scale);
+		transform.translate(-center.x, -center.y);
+
+		poly.translate(-center.x, -center.y);
+		poly.scale(scale);
+
+		PolygonSimple copy = poly.getOriginalPolygon();
+		if (copy != null) {
+			copy.translate(-center.x, -center.y);
+			copy.scale(scale);
+		}
+
 		setClipPolygon(poly);
-		
-		for(Site s:sites){
-			double a=s.getX();
-			double b=s.getY();
-			
-			a-=center.x;
-			b-=center.y;
-			
-			a*=scale;
-			b*=scale;			
+
+		for (Site s : sites) {
+			double a = s.getX();
+			double b = s.getY();
+
+			a -= center.x;
+			b -= center.y;
+
+			a *= scale;
+			b *= scale;
 			s.setX(a);
 			s.setY(b);
 		}
 	}
-	
-	private void transformBackFromZero(){	
-		
-			clipPolygon.scale(1/scale);
-			clipPolygon.translate(center.x, center.y);			
-			
-			for(Site s:sites){
-				double a=s.getX();
-				double b=s.getY();				
-				a/=scale;
-				b/=scale;			
-				
-				a+=center.x;
-				b+=center.y;
-				
-				s.setX(a);
-				s.setY(b);
-								
-				PolygonSimple poly = s.getPolygon();								
-				poly.scale(1/scale);
-				poly.translate(center.x, center.y);
-				s.setPolygon(poly);
-				
-				PolygonSimple copy = poly.getOriginalPolygon();
-				if(copy!=null){				
-					copy.scale(1/scale);
-					copy.translate(center.x, center.y);					
-				}
-				
-				s.setWeight(s.getWeight()/(scale*scale));
+
+	private void transformBackFromZero() {
+
+		clipPolygon.scale(1 / scale);
+		clipPolygon.translate(center.x, center.y);
+
+		for (Site s : sites) {
+			double a = s.getX();
+			double b = s.getY();
+			a /= scale;
+			b /= scale;
+
+			a += center.x;
+			b += center.y;
+
+			s.setX(a);
+			s.setY(b);
+
+			PolygonSimple poly = s.getPolygon();
+			poly.scale(1 / scale);
+			poly.translate(center.x, center.y);
+			s.setPolygon(poly);
+
+			PolygonSimple copy = poly.getOriginalPolygon();
+			if (copy != null) {
+				copy.scale(1 / scale);
+				copy.translate(center.x, center.y);
 			}
-			
-			
-			
-//			center.x=0;
-//			center.y=0;
-//			scale=1.0;
-		
+
+			s.setWeight(s.getWeight() / (scale * scale));
+		}
+
+		scale = 1.0;
+		center.x = 0;
+		center.y = 0;
 	}
 
-	private void solveDuplicates(OpenList sites) {
-		// sort the points, and then check for duplicates
-		Site[] array = sites.array;
-		int size = sites.size;
-		Arrays.sort(array, 0, size);
-		int length = size - 1;
-		for (int i = 0; i < length; i++) {
-			Site s1 = array[i];
-			Site s2 = array[i + 1];
-			if (s1.compareTo(s2) == 0) {
-				int third = i + 2;
-				if (third != size) {
-					Site s3 = array[third];
-					if (s2.compareTo(s3) != 0) {
-						double x = s1.getX() + s3.getX();
-						double y = s1.getY() + s3.getY();
-						x /= 2;
-						y /= 2;
-						s2.setXY(x + 0.02, y);
-						// System.out.println("S1:"+s1+"\nS2:"+s2+"\nS3:"+s3);
-					} else {
-						throw new RuntimeException(
-								"three points have same coordinates");
-					}
-				} else {
-					s2.setX(s2.getX() + 2E-7);
-					// System.out.println("Last: S1:"+s1+"\t S2:"+s2);
-				}
-			}
-		}
-	}
-	
-/**
- * For debugging only
- * @param isLast
- */
+	/**
+	 * For debugging only
+	 * 
+	 * @param isLast
+	 */
 	public void drawCurrentState(boolean isLast) {
 		if (graphics != null) {
-			drawState(graphics, false);			
+			drawState(graphics, false);
 			frame.repaint();
 			// frame.resize(frame.getSize());
 			// frame.validate();
@@ -746,110 +704,76 @@ public class VoronoiCore {
 		// }
 	}
 
-	/**
-	 * Converts the SVG Graphics2D to a pdf
-	 * 
-	 * @param filename
-	 * @param svgGraphics
-	 */
-	// public void createPDF(String filename, SVGGraphics2D svgGraphics){
-	//
-	// PDFTranscoder t=new PDFTranscoder();
-	//
-	// Rectangle bb =clipPolygon.getBounds();
-	// t.addTranscodingHint(JPEGTranscoder.KEY_WIDTH, new Float(bb.getWidth()));
-	// t.addTranscodingHint(JPEGTranscoder.KEY_HEIGHT, new
-	// Float(bb.getHeight()));
-	// // Create the transcoder input.
-	// try {
-	// String svgURI = new File(filename).toURL().toString();
-	// TranscoderInput input = new TranscoderInput(svgURI);
-	//
-	// // Create the transcoder output.
-	// OutputStream ostream = new FileOutputStream(filename+".pdf");
-	// TranscoderOutput output = new TranscoderOutput(ostream);
-	//
-	// // Save the image.
-	// t.transcode(input, output);
-	//
-	// // Flush and close the stream.
-	// ostream.flush();
-	// ostream.close();
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	//
-	//
-	// }
-
 	
-	public Color getFillColorScaled(Site s){
-		double increase=s.getLastIncrease();
-		
-//		double area=s.getPolygon().getArea();
+
+	public Color getFillColorScaled(Site s) {
+		double increase = s.getLastIncrease();
+
+		// double area=s.getPolygon().getArea();
 		double completeArea = clipPolygon.getArea();
-		double wantedArea=completeArea*s.getPercentage();
-		double value=wantedArea/completeArea;
-		InterpolColor interpolPos=new InterpolColor(1, 2, 0.6, 0.0, 0.8, 0.6, 1.0, 0.8);
-		
-		InterpolColor interpolNeg=new InterpolColor(0.5, 1.0,0.0, 0.9, 0.8, 0.0, 0.0, 0.8);
-		
-		int alpha=(int)value*256+50;
-		if(increase<1.0){ 
-			Math.max(increase,0.5);
-			return interpolNeg.getColorLinear(increase,alpha);
-		
+		double wantedArea = completeArea * s.getPercentage();
+		double value = wantedArea / completeArea;
+		InterpolColor interpolPos = new InterpolColor(1, 2, 0.6, 0.0, 0.8, 0.6,
+				1.0, 0.8);
+
+		InterpolColor interpolNeg = new InterpolColor(0.5, 1.0, 0.0, 0.9, 0.8,
+				0.0, 0.0, 0.8);
+
+		int alpha = (int) value * 256 + 50;
+		if (increase < 1.0) {
+			Math.max(increase, 0.5);
+			return interpolNeg.getColorLinear(increase, alpha);
+
 		}
-		if(increase>1.0){ 
-		increase=Math.min(increase, 2.0);
-		return interpolPos.getColorLinear(increase,alpha);
+		if (increase > 1.0) {
+			increase = Math.min(increase, 2.0);
+			return interpolPos.getColorLinear(increase, alpha);
 		}
 		return Color.white;
 	}
-	
+
 	public synchronized void drawState(Graphics2D g, boolean isLast) {
-		try {	
-			if(transform!=null)
-			g.setTransform(transform.createInverse());
+		try {
+			if (transform != null)
+				g.setTransform(transform.createInverse());
 		} catch (NoninvertibleTransformException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
-//		g.translate(center.x, center.y);
-//		g.scale(1/scale,1/scale);
-		
-//		g.clearRect(-2000, -2000, 5000, 5000);
-//		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//				RenderingHints.VALUE_ANTIALIAS_ON);
 
-//		g.setColor(Colors.circleBorder);
-//		g.draw(clipPolygon);
-		
-//		Site[] array = sites.array;
-//		int size = sites.size;
-//		
-//		for (int z = 0; z < size; z++) {
-//			Site s = array[z];
-//			g.setColor(Colors.circleFill);
-//			s.paint(g);
-//			s.paintLastIncrease(g, 15);
-//			
-////			// write the number of the site down
-////			g.setColor(Color.black);
-////			g.setFont(g.getFont().deriveFont(7F));
-////			g.drawString(new Integer(z + 1).toString(), (int) s.getX() + 1,
-////					(int) s.getY() - 1);
-//
-//		}
-		
-		for (Site s:sites) {
-//			if(isLast){
+		// g.translate(center.x, center.y);
+		// g.scale(1/scale,1/scale);
+
+		// g.clearRect(-2000, -2000, 5000, 5000);
+		// g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		// RenderingHints.VALUE_ANTIALIAS_ON);
+
+		// g.setColor(Colors.circleBorder);
+		// g.draw(clipPolygon);
+
+		// Site[] array = sites.array;
+		// int size = sites.size;
+		//
+		// for (int z = 0; z < size; z++) {
+		// Site s = array[z];
+		// g.setColor(Colors.circleFill);
+		// s.paint(g);
+		// s.paintLastIncrease(g, 15);
+		//
+		// // // write the number of the site down
+		// // g.setColor(Color.black);
+		// // g.setFont(g.getFont().deriveFont(7F));
+		// // g.drawString(new Integer(z + 1).toString(), (int) s.getX() + 1,
+		// // (int) s.getY() - 1);
+		//
+		// }
+
+		for (Site s : sites) {
+			// if(isLast){
 			g.setColor(Colors.circleFill);
 			s.paint(g);
-//			s.paintLastIncrease(g, 15);
-//			}
+			// s.paintLastIncrease(g, 15);
+			// }
 			PolygonSimple poly = s.getPolygon();
 			if (poly != null) {
 				// poly.shrinkForBorder(0.1);
@@ -861,20 +785,19 @@ public class VoronoiCore {
 				// Double centroid = poly.getCentroid();
 				// g.drawRoundRect(centroid.x-, y, width, height, arcWidth,
 				// arcHeight)
-			} 
-			
-//			// write the number of the site down
-//			g.setColor(Color.black);
-//			g.setFont(g.getFont().deriveFont(7F));
-//			g.drawString(new Integer(z + 1).toString(), (int) s.getX() + 1,
-//					(int) s.getY() - 1);
+			}
 
-			g.drawString("AreaError: "+computeAreaError(sites), 30, 80);
-			g.drawString("Iteration: "+currentIteration, 30, 110);
-		}	
-		
-	}	
+			// // write the number of the site down
+			// g.setColor(Color.black);
+			// g.setFont(g.getFont().deriveFont(7F));
+			// g.drawString(new Integer(z + 1).toString(), (int) s.getX() + 1,
+			// (int) s.getY() - 1);
 
+			g.drawString("AreaError: " + computeAreaError(sites), 30, 80);
+			g.drawString("Iteration: " + currentIteration, 30, 110);
+		}
+
+	}
 
 	public void setSites(OpenList sites) {
 		this.sites = sites;
@@ -884,177 +807,46 @@ public class VoronoiCore {
 		return sites;
 	}
 
+
+	 public static void main(String[] args) {
 	
-	/**
-	 * Generate Pictures which show iterative algorithm.
-	 * 
-	 * @param args
-	 */
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-		VoronoiCore core = new VoronoiCore();
-		
-		
-		
-		
-		OpenList sites = new OpenList();
-		Random rand = new Random(100);
-		int amount = 200;
-		PolygonSimple poly=new PolygonSimple();
-		poly.add(689.9651905597373,145.90102355392779);
-		poly.add(689.9162113924474,145.86265582614726);
-		poly.add(689.9349290903262,145.84557019027574);
-		OpenList list=new OpenList(3);
-		list.add(new Site(689.9422605317291,145.8714615973337,-0.03753885679534165));
-		list.add(new Site(689.9448954217913,145.8779071771503,-0.03729671972308682));
-		list.add(new Site(689.9255328631803,145.86324024279807,2315.525799860274));
-
-		PolygonSimple rootPolygon = new PolygonSimple();
-		int width = 500;
-		int height = 500;
-		rootPolygon.add(0, 0);
-		rootPolygon.add(width, 0);
-		rootPolygon.add(width, height);
-		rootPolygon.add(0, height);
-		for (int i = 0; i < amount; i++) {
-			Site site = new Site(rand.nextInt(width), rand.nextInt(width));
-			site.setPercentage(1);
-			sites.add(site);
-		}
-		sites.get(0).setPercentage(3);
-
-//		core.setDebugMode();
-		// core.setOutputMode();
-		core.normalizeSites(sites);
-		core.setSites(sites);
-		core.setClipPolygon(rootPolygon);
-		
-		long start = System.currentTimeMillis();
-		core.doIterate();
-		long end = System.currentTimeMillis();
-		double diff = (end - start) / 1000.0D;
-		System.out.println("NeededTime: " + diff);
-		// }
-	}
+	 VoronoiCore.setDebugMode();
+	 VoronoiCore core = new VoronoiCore();
+	 OpenList sites = new OpenList();
+	 Random rand=new Random(200);
+	 int amount=500;
+	 PolygonSimple rootPolygon = new PolygonSimple();
+	 int width=1000;
+	 int height=1000;
 	
-//	/**
-//	 * Generate Pictures which show iterative algorithm.
-//	 * 
-//	 * @param args
-//	 */
-//	/**
-//	 * @param args
-//	 */
-//	public static void main(String[] args) {
-//
-//		VoronoiCore core = new VoronoiCore();
-//		OpenList sites = new OpenList();
-//		Random rand = new Random(100);
-//		int amount = 200;
-//
-//		PolygonSimple rootPolygon = new PolygonSimple();
-//		int width = 500;
-//		int height = 500;
-//		rootPolygon.add(0, 0);
-//		rootPolygon.add(width, 0);
-//		rootPolygon.add(width, height);
-//		rootPolygon.add(0, height);
-//		for (int i = 0; i < amount; i++) {
-//			Site site = new Site(rand.nextInt(width), rand.nextInt(width));
-//			site.setPercentage(1);
-//			sites.add(site);
-//		}
-//		sites.get(0).setPercentage(3);
-//
-//		core.setDebugMode();
-//		// core.setOutputMode();
-//		core.normalizeSites(sites);
-//		// ArrayList<Site> sites = TestConvergence.getSites(100, rectangle,
-//		// true);
-//		// core.setErrorAreaThreshold(0.00);
-//		// core.setUseExtrapolation(false);
-//		// normalizeSites(sites);
-//		core.setSites(sites);
-//		core.setClipPolygon(rootPolygon);
-//		long start = System.currentTimeMillis();
-//
-//		core.setUseNegativeWeights(true);
-//		core.setCancelOnAreaErrorThreshold(true);
-//		core.doIterate(5000);
-//
-//		long end = System.currentTimeMillis();
-//		double diff = (end - start) / 1000.0D;
-//		System.out.println("NeededTime: " + diff);
-//		// }
-//	}
+	 for (int i=0;i<amount;i++){
+	 Site site = new Site(rand.nextDouble()*width, rand.nextDouble()*height);
+	 site.setPercentage(rand.nextFloat());
+	 sites.add(site);
+	 }
+	 sites.get(0).setPercentage(50);
+	 sites.get(1).setPercentage(50);
+	 // sites.get(6).setWeight(2000);
+	 // sites.get(6).setXY(270, 320);
+	 // System.out.println(sites.get(6));
+	 // width=600;
+	 // height=600;
+	
+	 rootPolygon.add(0, 0);
+	 rootPolygon.add(width, 0);
+	 rootPolygon.add(width, height);
+	 rootPolygon.add(0, height);
+		
+	
+	 core.setDebugMode(); 
+	 core.normalizeSites(sites);
 
-	// public static void main(String[] args) {
-	//
-	// VoronoiCore.setDebugMode();
-	// VoronoiCore core = new VoronoiCore();
-	// OpenList sites = new OpenList();
-	// Random rand=new Random(200);
-	// int amount=600;
-	// core.setUseExtrapolation(true);
-	// PolygonSimple rootPolygon = new PolygonSimple();
-	// int width=1000;
-	// int height=1000;
-	//
-	// for (int i=0;i<amount;i++){
-	// Site site = new Site(rand.nextDouble()*width, rand.nextDouble()*height);
-	// site.setPercentage(rand.nextFloat());
-	// sites.add(site);
-	// // System.out.println(site);
-	// }
-	// sites.get(0).setPercentage(50);
-	// sites.get(1).setPercentage(50);
-	// // sites.get(6).setWeight(2000);
-	// // sites.get(6).setXY(270, 320);
-	// // System.out.println(sites.get(6));
-	// // width=600;
-	// // height=600;
-	//
-	// rootPolygon.add(0, 0);
-	// rootPolygon.add(width, 0);
-	// rootPolygon.add(width, height);
-	// rootPolygon.add(0, height);
-	//
-	//
-	//
-	//
-	// core.setDebugMode();
-	// // core.setOutputMode();
-	// core.normalizeSites(sites);
-	// core.setGuaranteeValidCells(true);
-	// // ArrayList<Site> sites = TestConvergence.getSites(100, rectangle,
-	// // true);
-	// // core.setErrorAreaThreshold(0.00);
-	// // core.setUseExtrapolation(false);
-	// // normalizeSites(sites);
-	// core.setSites(sites);
-	// core.setClipPolygon(rootPolygon);
-	// core.doIterate(200);
-	// core.doIterate(200);
-	//
-	// // }
-	// }
-
-	// public void setOutputMode() {
-	// outPutMode = true;
-	// // Get a DOMImplementation.
-	// DOMImplementation domImpl =
-	// GenericDOMImplementation.getDOMImplementation();
-	//
-	// // Create an instance of org.w3c.dom.Document.
-	// String svgNS = "http://www.w3.org/2000/svg";
-	// Document document = domImpl.createDocument(svgNS, "svg", null);
-	//
-	// // Create an instance of the SVG Generator.
-	// svgGraphics = new SVGGraphics2D(document);
-	// }
+	 core.setSites(sites);
+	 core.setClipPolygon(rootPolygon);
+	 core.doIterate();	 
+	
+	 // }
+	 }
 
 	public static void normalizeSites(OpenList sites) {
 		double sum = 0;
@@ -1072,11 +864,11 @@ public class VoronoiCore {
 	}
 
 	public void setLevel(int height) {
-		this.level=height;
+		this.level = height;
 	}
 
 	public void setSettings(VoroSettings coreSettings) {
-		this.settings=coreSettings;
+		this.settings = coreSettings;
 	}
 
 }

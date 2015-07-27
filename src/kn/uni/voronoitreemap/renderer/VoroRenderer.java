@@ -17,28 +17,21 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.MultipleGradientPaint.CycleMethod;
 import java.awt.Paint;
 import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLayeredPane;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
-
 import kn.uni.voronoitreemap.gui.Colors;
-import kn.uni.voronoitreemap.gui.JPolygon;
 import kn.uni.voronoitreemap.helper.InterpolColor;
 import kn.uni.voronoitreemap.j2d.Point2D;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
@@ -49,11 +42,12 @@ import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
  * Renderer which should draw the polygons of a Voronoi Treemap into a
  * Graphics2D. Mainly used for debugging and testing.
  * 
- * @author nocaj
+ * @author Arlind Nocaj
  * 
  */
 
 public class VoroRenderer {
+	private boolean renderText=true;
 
 	boolean drawNames = true;
 	Graphics2D g;
@@ -123,7 +117,7 @@ public class VoroRenderer {
 			}
 		}
 
-		System.out.println("Elements:" + nodeList.size());
+//		System.out.println("Elements:" + nodeList.size());
  
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -263,6 +257,8 @@ if(filename!=null){
 	
 	
 	private void drawName(VoroNode child, Graphics2D g) {
+		if(!renderText) return;
+		
 		if(child.getHeight()>3) return;
 //		if(child.getHeight()>2) continue;
 ////		if(child.getHeight()==3 && rand.nextDouble()<0.50) continue;
@@ -336,6 +332,14 @@ if(filename!=null){
 			nextTry *= .9;
 		}
 		return font;
+	}
+
+	public boolean isRenderText() {
+		return renderText;
+	}
+
+	public void setRenderText(boolean renderText) {
+		this.renderText = renderText;
 	}
 
 }

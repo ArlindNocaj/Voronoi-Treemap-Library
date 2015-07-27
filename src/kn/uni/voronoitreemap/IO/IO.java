@@ -173,16 +173,7 @@ public static ArrayList<Tuple3ID> readRelativeVector(String filename) throws Exc
 		return n;
 	}
 	
-	
-	public static void main(String[] args){
-		String file="OctagonLinkedList.txt";
-		try {
-			readEdgeList(file);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+
 	
 	public static TreeData readEdgeList(String filename) throws Exception {
 			int numLines=countLines(filename);

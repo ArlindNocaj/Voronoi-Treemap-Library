@@ -12,21 +12,14 @@
  ******************************************************************************/
 package kn.uni.voronoitreemap.IO;
 
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
-import de.erichseifert.vectorgraphics2d.PDFGraphics2D;
 import kn.uni.voronoitreemap.interfaces.StatusObject;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.renderer.VoroRenderer;
 import kn.uni.voronoitreemap.treemap.VoronoiTreemap;
+import de.erichseifert.vectorgraphics2d.PDFGraphics2D;
 
 /**
  * Class to write the result out as PNG file, e.g. when used from command line.
@@ -57,6 +50,7 @@ public class PDFStatusObject implements StatusObject {
 				rootRect.getHeight()+2*border);
 
 		VoroRenderer renderer = new VoroRenderer();
+		renderer.setRenderText(false);
 		renderer.setTreemap(treemap);
 		g.translate(border, border);
 		renderer.setGraphics2D(g);
@@ -70,7 +64,7 @@ public class PDFStatusObject implements StatusObject {
 			file.write(g.getBytes());
 			file.close();
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 
 	}

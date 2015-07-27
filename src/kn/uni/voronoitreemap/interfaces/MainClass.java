@@ -63,7 +63,7 @@ public class MainClass {
 	 */
 	public static void main(String[] args) {
 		if (args.length == 0) {
-		      System.out.println("VoroTreemap v0.2 - Voronoi Treemap library for Java   (c) 2015 University of Konstanz\n  usage: VoroTreemap  [options] infile        see manual for more details\n  options \n   -iF Filename \n");
+		      System.out.println("JVTL v0.2 - Java Voronoi Treemap Library, (c) 2015 University of Konstanz\n  usage: VoroTreemap  [options] infile        see manual for more details\n  options \n   -iF Filename \n");
 		      return;
 		    }
 		    try {
@@ -97,13 +97,11 @@ public class MainClass {
 //		    					rootPolygon.add(x,y);
 //							}
 		
-	
-		    				
+			    				
 		    				rootPolygon.add(0, 0);
 		    				rootPolygon.add(width, 0);
 		    				rootPolygon.add(width, height);
 		    				rootPolygon.add(0, height);
-
 		    				
 		    				
 //			    			VoronoiCore.setDebugMode(); 
@@ -111,12 +109,12 @@ public class MainClass {
 		    			   	treemap.setRootPolygon(rootPolygon);
 		    			   	treemap.readEdgeList(filename);			    			    					    			
 			    			treemap.setCancelOnMaxIteration(true);
-			    			treemap.setNumberMaxIterations(3000);
+			    			treemap.setNumberMaxIterations(2000);
 			    			treemap.setCancelOnThreshold(true);
-			    			treemap.setErrorAreaThreshold(0.02);
-			    			treemap.setUniformWeights(true);
+			    			treemap.setErrorAreaThreshold(0.05);
+			    			treemap.setUniformWeights(false);
 			    			
-			    			treemap.setNumberThreads(1);			    						    			
+			    			treemap.setNumberThreads(8);			    						    			
 			    			
 			    			treemap.setStatusObject(new WriteStatusObject(getFileName(name, "txt","-finished"),treemap));
 			    			treemap.setStatusObject(new PNGStatusObject(getFileName(name, "png"), treemap));

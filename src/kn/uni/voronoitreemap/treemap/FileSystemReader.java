@@ -69,8 +69,7 @@ public class FileSystemReader {
 			length = file.length();
 		
 		length=Math.max(length, 1);
-		length=Math.log(length)+1;
-		System.out.println("length: "+length);
+		length=Math.log(length)+1;		
 		String line = nodeId + ";" + parentId + ";" + file.getName().replace(";", "") + ";"
 				+ length;
 		

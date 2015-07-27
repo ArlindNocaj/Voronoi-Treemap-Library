@@ -14,7 +14,7 @@ package kn.uni.voronoitreemap.interfaces.data;
 
 /**
  * Stores a triple where the first entry is an integer (e.g. node id), the second and third a double value (e.g. x and y coordinates)
- * @author nocaj
+ * @author Arlind Nocaj
  *
  */
 public class Tuple3ID {

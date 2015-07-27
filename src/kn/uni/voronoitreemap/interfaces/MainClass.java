@@ -116,7 +116,7 @@ public class MainClass {
 		// width=600*2;
 		// height=400*2;
 		//
-		int numPoints = 12;
+		int numPoints = 20;
 		for (int j = 0; j < numPoints; j++) {
 			double angle = 2.0 * Math.PI * (j * 1.0 / numPoints);
 			double rotate = 2.0 * Math.PI / numPoints / 2;

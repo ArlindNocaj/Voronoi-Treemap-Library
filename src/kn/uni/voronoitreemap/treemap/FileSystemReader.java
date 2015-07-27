@@ -41,7 +41,7 @@ public class FileSystemReader {
 	}
 
 	public void listDir(File dir, int parentId) throws IOException {
-		System.out.println(dir.getName()+"\t"+parentId);
+//		System.out.println(dir.getName()+"\t"+parentId);
 		File[] files = dir.listFiles();
 		if (files == null || files.length < 1)
 			return;

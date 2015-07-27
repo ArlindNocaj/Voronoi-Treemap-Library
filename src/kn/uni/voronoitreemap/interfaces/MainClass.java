@@ -64,7 +64,6 @@ public class MainClass {
 							+ "Computes a Voronoi Treemap for the given input file and stores the result in a link list format ing visu as a PNG and as link"
 							+ "options \n   "							
 							+ "-d uses FILE as a directory and extracts the hierarchical structure from this directory as basis for the treemap \n"
-							+ "-w uses weighted (non uniform) leaf cells"
 							+ "-pdf generates a pdf version of the Voronoi treemap (very slow) \n"
 							
 							+ "Examples:"

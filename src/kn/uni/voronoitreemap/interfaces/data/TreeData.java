@@ -12,7 +12,9 @@ import java.util.HashMap;
  */
 public class TreeData {
 
-	public ArrayList<ArrayList<Integer>> tree;	
+	//adjacency list of the tree structure
+	public ArrayList<ArrayList<Integer>> tree;
+	// index of the root node
 	public Integer rootIndex;
 		
 	//map pointing to the node attributes of a specific id

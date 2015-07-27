@@ -82,7 +82,7 @@ public class FileSystemReader {
 			if(expFile.exists()) expFile.delete();
 			
 			this.writer = new BufferedWriter(new FileWriter(getExportFile()));
-			String header="nodeI;parentId;name;weight";
+			String header="nodeId;parentId;name;weight";
 			writer.write(header+"\n");
 			nodeCount = 0;
 			listDir(new File(directory), nodeCount);

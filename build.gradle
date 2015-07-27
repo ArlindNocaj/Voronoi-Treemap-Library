@@ -1,0 +1,29 @@
+
+apply plugin: 'java'
+group = 'algo.uni.kn'
+version='0.2'
+jar.archiveName = "JVoroTreemap.jar"
+
+
+sourceSets {
+	main {
+		java{
+		srcDir 'src'
+		srcDir 'power-diagram/src'
+		}
+
+	}
+}
+
+dependencies {
+	compile files('libs/VectorGraphics2D-0.9.1.jar')
+}
+
+jar {
+  exclude 'META-INF/**/*'
+  manifest { attributes 'Main-Class': 'kn.uni.voronoitreemap.interfaces.MainClass' }
+  from "LICENSE.txt"
+  from "README.md"
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+

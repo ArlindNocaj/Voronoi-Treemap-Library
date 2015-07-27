@@ -55,11 +55,11 @@ public class WriteStatusObject implements StatusObject {
 		
 		writeTreemap();
 		
-		try{
+		try{			
 		writer.flush();
 		writer.close();
 		}catch(Exception e){
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 		
 	}

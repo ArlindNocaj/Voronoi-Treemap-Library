@@ -67,8 +67,9 @@ java -jar build/libs/JVoroTreemap.jar -d ~/Desktop
 
 How to use the library
 -------------
-Here is a simple hierarchy from which we want to generate a Voronoi treemap.
-(same structure as in ``examples/miniHierarchy.txt``)
+For simple hierarchy as the following:
+
+(same structure is given in ``examples/miniHierarchy.txt``)
 
 ```
  project
@@ -96,10 +97,11 @@ Here is a simple hierarchy from which we want to generate a Voronoi treemap.
 │    │   file035
 │    │   file036
 ```
+we get
 
-![mini hierarchy](https://github.com/ArlindNocaj/Voronoi-Treemap-Library/raw/master/examples/miniHierarchy.png)!
+![mini hierarchy](https://github.com/ArlindNocaj/Voronoi-Treemap-Library/raw/master/examples/miniHierarchy.png)
 
-when using the following code (in ``kn.uni.voronoitreemap.interfaces.Sample1.java``):
+when using the following code (see ``kn.uni.voronoitreemap.interfaces.Sample1.java``):
 ```java
     // create a convex root polygon
     PolygonSimple rootPolygon = new PolygonSimple();

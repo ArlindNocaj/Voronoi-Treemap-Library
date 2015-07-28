@@ -47,7 +47,7 @@ public class WriteStatusObject implements StatusObject {
 			String header="nodeId;parentID;name;weight;hierarchyLevel;sitePosX;sitePosY;siteWeight;polygonPoints x1,y2,x2,y2\n";
 		writer.write(header);			
 		} catch (IOException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 	@Override

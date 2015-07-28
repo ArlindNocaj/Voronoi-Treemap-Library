@@ -110,43 +110,7 @@ public class WriteStatusObject implements StatusObject {
 	@Override
 	synchronized public void finishedNode(int Node, int layer, int[] children,
 			PolygonSimple[] polygons) {
-//		if (children==null)
-//			return;
-//		HashMap<Integer, VoroNode> idToNode = treemap.getIdToNode();
-//		
-////		String header="nodeId;parentID;name;weight;hierarchyLevel;sitePosX;sitePosY;siteWeight;polygonPoints x1,y2,x2,y2\n";
-//		for (int i=0;i<children.length;i++){
-//			Integer nodeId=i;
-//			VoroNode voronode = idToNode.get(nodeId);
-//			if(voronode==null) {
-//				System.out.println("No voronode for: "+nodeId+"\t level: "+layer);
-//				continue;
-//			}
-//			Site site = voronode.getSite();
-//			if(site==null ) {
-//				System.out.println("site null: "+nodeId+"\t level: "+layer+"\t children: "+voronode.getChildren());
-//				continue;
-//			}
-//				StringBuilder builder=new StringBuilder();
-//				builder.append(children[i]+";"+Node+";"+voronode.name+";"+voronode.getWeight()+";"+layer+";"+site.x+";"+site.y+";"+site.getWeight()+";");
-//				PolygonSimple polygon=polygons[i];
-//				if(polygon!=null){
-//				double[] xPoints = polygon.getXPoints();
-//				double[] yPoints = polygon.getYPoints();
-//				
-//				for (int j=0;j<polygon.length;j++){
-//					String first=(j==0)?"":",";
-//					builder.append(first+xPoints[j]+","+yPoints[j]);
-//				}
-//				}else
-//					builder.append("0,0");
-//				
-//				try {
-//					writer.write(builder.toString()+"\n");
-//				}catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//		}
+
 	}
 
 }

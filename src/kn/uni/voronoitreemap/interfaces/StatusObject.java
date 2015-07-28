@@ -13,7 +13,6 @@
 package kn.uni.voronoitreemap.interfaces;
 
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
-import kn.uni.voronoitreemap.treemap.VoroNode;
 
 /**
  * This object is used to notify certain steps to outer objects, e.g. when a node is finished.

@@ -44,7 +44,7 @@ public class IO {
 	
 	
 	public static void main(String[] args){
-		String file="example/Octagon.txt";
+		String file="examples/fujaba.txt";
 		try {
 			readEdgeList(file);
 		} catch (Exception e) {

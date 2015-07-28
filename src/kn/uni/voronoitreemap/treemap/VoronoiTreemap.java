@@ -33,6 +33,9 @@ import java.util.concurrent.Semaphore;
 import javax.swing.JLayeredPane;
 
 import kn.uni.voronoitreemap.IO.IO;
+import kn.uni.voronoitreemap.IO.PDFStatusObject;
+import kn.uni.voronoitreemap.IO.PNGStatusObject;
+import kn.uni.voronoitreemap.IO.WriteStatusObject;
 import kn.uni.voronoitreemap.core.VoroSettings;
 import kn.uni.voronoitreemap.core.VoronoiCore;
 import kn.uni.voronoitreemap.debug.ImageFrame;
@@ -209,70 +212,66 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject {
 	}
 
 	public static void main(String[] args) {
-		VoronoiCore.setDebugMode();
-		// VoronoiCore.graphics.translate(-178,-483);
-		// VoronoiCore.graphics.scale(5, 5);
-		VoronoiTreemap voronoiTreemap = new VoronoiTreemap();
-		voronoiTreemap.setUseBorder(true);
-		voronoiTreemap.setShrinkPercentage(0.95);
+		
+		
+		VoronoiTreemap voronoiTreemap = new VoronoiTreemap();				
 
+		//create a convex root polygon
 		PolygonSimple rootPolygon = new PolygonSimple();
-		int width = 500;
+		int width = 300;
 		int height = 500;
-		rootPolygon.add(0, 0);
-		rootPolygon.add(width, 0);
-		rootPolygon.add(width, height);
-		rootPolygon.add(0, height);
-
-		voronoiTreemap.setRootPolygon(rootPolygon);
-
-		// array with relative positions
-		Random rand = new Random();
-		double[][] relativePositions = new double[8][2];
-		for (int i = 0; i < 8; i++) {
-			relativePositions[i][0] = rand.nextDouble();
-			relativePositions[i][1] = rand.nextDouble();
+		int numPoints = 8;
+		for (int j = 0; j < numPoints; j++) {
+			double angle = 2.0 * Math.PI * (j * 1.0 / numPoints);
+			double rotate = 2.0 * Math.PI / numPoints / 2;
+			double y = Math.sin(angle + rotate) * height + height;
+			double x = Math.cos(angle + rotate) * width + width;
+			rootPolygon.add(x, y);
 		}
-		// array with goal area weights, can also be not normalized
-		double[] areaGoals = new double[8];
-		for (int i = 0; i < areaGoals.length; i++) {
-			areaGoals[i] = rand.nextInt(100);
-		}
+		
+		//create hierarchy structure (first parent will be root element)
+		TreeData data=new TreeData();
+		data.addLink("README.md", "project");
+		data.addLink("file001", "project");
+		
+		data.addLink("folder1", "project");
+		data.addLink("file011", "folder1");
+		data.addLink("file012", "folder1");
+		
+		data.addLink("subfolder1", "folder1");
+		data.addLink("file111", "subfolder1");
+		data.addLink("file112", "subfolder1");
+		data.addLink("...", "subfolder1");
+		
+		data.addLink("folder2","folder1");
+		data.addLink("file021","folder2");
+		data.addLink("file022","folder2");	
+		
+		data.addLink("folder3", "project");
+		data.addLink("file031","folder3");
+		data.addLink("file032","folder3");
+		data.addLink("file033","folder3");
+		data.addLink("file034","folder3");
+		data.addLink("file035","folder3");
+		data.addLink("file036","folder3");
+	
+//		VoronoiCore.setDebugMode();
+		VoronoiTreemap treemap = new VoronoiTreemap();
+		treemap.setRootPolygon(rootPolygon);
+		treemap.setTreeData(data);
+		treemap.setCancelOnMaxIteration(true);
+		treemap.setNumberMaxIterations(1500);
+		treemap.setCancelOnThreshold(true);
+		treemap.setErrorAreaThreshold(0.01);
+		treemap.setUniformWeights(true);
+		treemap.setNumberThreads(1);
 
-		// voronoiTreemap.setEdgeListAndWeights(treeStructure, areaGoals,
-		// relativePositions);
-		// voronoiTreemap.setTreeAndWeights(treeStructure,areaGoals,relativePositions);
-		/**
-		 * Things which have to be set:
-		 */
-		/**
-		 * sites: x,y,initialWeights
-		 * 
-		 */
-
-		// /**
-		// * ImageFrame
-		// */
-		// BufferedImage image = new BufferedImage(800, 800,
-		// BufferedImage.TYPE_INT_RGB);
-		//
-		// ImageFrame frame = new ImageFrame(image);
-		// frame.setVisible(true);
-		// frame.setBounds(20, 20, 1600, 800);
-		// Graphics2D graphic = image.createGraphics();
-		// voronoiTreemap.setGraphics(graphic);
-
-		/**
-		 * Panel and JFrame;
-		 */
-		// JFrame frame = new JFrame();
-		// frame.setBounds(20, 20, 1400, 1400);
-		// frame.setVisible(true);
-		JLayeredPane layeredPane = new JLayeredPane();
-		layeredPane.setLayout(null);
-		// frame.getContentPane().add(layeredPane);
-
-		voronoiTreemap.compute();
+		treemap.setStatusObject(new WriteStatusObject("miniHierarchy-result", treemap));
+		treemap.setStatusObject(new PNGStatusObject("miniHierarchy",
+				treemap));
+		treemap.setStatusObject(new
+				 PDFStatusObject("miniHierarchy", treemap));
+		treemap.computeLocked();				
 	}
 
 	public void setRootIndex(int rootIndex) {
@@ -449,42 +448,9 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject {
 
 	@Override
 	public synchronized void finished() {
-
-		timeEnd = System.currentTimeMillis();
-		// System.out.println("AmountSites:" + VoronoiCore.amountSites);
-		double diff = timeEnd - timeStart;
-		// System.out.println("Nodes done:" + this.alreadyDoneNodes);
-		//
-		// System.out.println("ComputationTime seconds:" + diff / 1000.0);
-
-		// drawTreemap(graphics);
-		// drawTreemapWithComponents(graphics);
-		/**
-		 * Using the JPolygon components
-		 */
-		// for (VoroNode node : this) {
-		// int height = node.getHeight();
-		//
-		// Site site = node.getSite();
-		// if (site != null) {
-		// NPoly poly = site.getPolygon();
-		// if (poly != null) {
-		// if (site.cellObject != null) {
-		// site.cellObject.setVoroPolygon(poly);
-		// site.cellObject.doFinalWork();
-		// }
-		// }
-		// }
-		// JPolygon component = node.getPolygonComponent();
-		// if (component != null) { if (areaGoals!=null){
-		// this.getLayeredPane().add(component, new Integer(height));
-		// }
-		// }
-
 		for (StatusObject statusObject : this.statusObject)
 			statusObject.finished();
 		lock.release();
-
 	}
 
 	protected void setAmountNodes(int amountNodes) {

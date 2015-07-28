@@ -14,17 +14,12 @@ package kn.uni.voronoitreemap.core;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Random;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MaximizeAction;
-
-import jdk.internal.jfr.events.ErrorThrownEvent;
 import kn.uni.voronoitreemap.datastructure.OpenList;
 import kn.uni.voronoitreemap.debug.ImageFrame;
 import kn.uni.voronoitreemap.debuge.Colors;

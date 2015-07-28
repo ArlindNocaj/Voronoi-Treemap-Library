@@ -12,8 +12,8 @@ public class Sample1 {
 	public static void main(String[] args) {
 		// create a convex root polygon
 		PolygonSimple rootPolygon = new PolygonSimple();
-		int width = 300;
-		int height = 500;
+		int width = 500;
+		int height = 200;
 		int numPoints = 8;
 		for (int j = 0; j < numPoints; j++) {
 			double angle = 2.0 * Math.PI * (j * 1.0 / numPoints);

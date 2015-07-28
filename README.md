@@ -65,10 +65,13 @@ java -jar build/libs/JVoroTreemap.jar -d ~/Desktop
 ```
 
 
-How to use the source code
+How to use the library
 -------------
+Here is a simple hierarchy from which we want to generate a Voronoi treemap.
+(same structure as in ``examples/miniHierarchy.txt``)
+
 ```
-project
+ project
 │   README.md
 │   file001
 │
@@ -92,9 +95,72 @@ project
 │    │   file034
 │    │   file035
 │    │   file036
-
 ```
 
+<img src="https://github.com/ArlindNocaj/Voronoi-Treemap-Library/raw/master/examples/miniHierarchy.png" width="200">
+
+when using the following code (in ``kn.uni.voronoitreemap.interfaces.Sample1.java``):
+```java
+    // create a convex root polygon
+    PolygonSimple rootPolygon = new PolygonSimple();
+    int width = 300;
+    int height = 500;
+    int numPoints = 8;
+    for (int j = 0; j < numPoints; j++) {
+      double angle = 2.0 * Math.PI * (j * 1.0 / numPoints);
+      double rotate = 2.0 * Math.PI / numPoints / 2;
+      double y = Math.sin(angle + rotate) * height + height;
+      double x = Math.cos(angle + rotate) * width + width;
+      rootPolygon.add(x, y);
+    }
+
+    // create hierarchical structure
+    TreeData data = new TreeData();
+    data.addLink("README.md", "project");
+    data.addLink("file001", "project");
+    data.setRoot("project");
+
+    data.addLink("folder1", "project");
+    data.addLink("file011", "folder1");
+    data.addLink("file012", "folder1");
+
+    data.addLink("subfolder1", "folder1");
+    data.addLink("file111", "subfolder1");
+    data.addLink("file112", "subfolder1");
+    data.addLink("...", "subfolder1");
+
+    data.addLink("folder2", "folder1");
+    data.addLink("file021", "folder2");
+    data.addLink("file022", "folder2");
+
+    data.addLink("folder3", "project");
+    data.addLink("file031", "folder3");
+    data.addLink("file032", "folder3");
+    data.addLink("file033", "folder3");
+    data.addLink("file034", "folder3");
+    data.addLink("file035", "folder3");
+    data.addLink("file036", "folder3");
+
+
+    // increases the size of the corresponding cell
+    // data.setWeight("file036", 4);
+
+    // VoronoiCore.setDebugMode(); //shows iteration process
+    VoronoiTreemap treemap = new VoronoiTreemap();
+    treemap.setRootPolygon(rootPolygon);
+    treemap.setTreeData(data);
+    treemap.setCancelOnMaxIteration(true);
+    treemap.setNumberMaxIterations(1500);
+    treemap.setCancelOnThreshold(true);
+    treemap.setErrorAreaThreshold(0.01);
+    // treemap.setUniformWeights(true);
+    treemap.setNumberThreads(1);
+
+    //add result handler
+    treemap.setStatusObject(new PNGStatusObject("miniHierarchy", treemap));
+    treemap.setStatusObject(new PDFStatusObject("miniHierarchy", treemap));
+    treemap.computeLocked();
+```
 
 License
 ------------------------

@@ -97,6 +97,7 @@ Here is a simple hierarchy from which we want to generate a Voronoi treemap.
 │    │   file036
 ```
 
+
 <img src="https://github.com/ArlindNocaj/Voronoi-Treemap-Library/raw/master/examples/miniHierarchy.png" width="200">
 
 when using the following code (in ``kn.uni.voronoitreemap.interfaces.Sample1.java``):

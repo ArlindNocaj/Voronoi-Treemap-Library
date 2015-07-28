@@ -23,7 +23,6 @@ Clone a copy of the git repo by running:
 ```
 git clone --recursive https://github.com/ArlindNocaj/Voronoi-Treemap-Library.git
 ```
-
 Make sure you have Java and Gradle installed (tested with Java 7 and Gradle 2.4):
 ``
 java -version
@@ -121,20 +120,16 @@ when using the following code (see ``kn.uni.voronoitreemap.interfaces.Sample1.ja
     data.addLink("README.md", "project");
     data.addLink("file001", "project");
     data.setRoot("project");
-
     data.addLink("folder1", "project");
     data.addLink("file011", "folder1");
     data.addLink("file012", "folder1");
-
     data.addLink("subfolder1", "folder1");
     data.addLink("file111", "subfolder1");
     data.addLink("file112", "subfolder1");
     data.addLink("...", "subfolder1");
-
     data.addLink("folder2", "folder1");
     data.addLink("file021", "folder2");
     data.addLink("file022", "folder2");
-
     data.addLink("folder3", "project");
     data.addLink("file031", "folder3");
     data.addLink("file032", "folder3");
@@ -142,13 +137,11 @@ when using the following code (see ``kn.uni.voronoitreemap.interfaces.Sample1.ja
     data.addLink("file034", "folder3");
     data.addLink("file035", "folder3");
     data.addLink("file036", "folder3");
+    // data.setWeight("file036", 4);// increase cell size (leafs only)
 
 
-    // increases the size of the corresponding cell
-    // data.setWeight("file036", 4);
-
-    // VoronoiCore.setDebugMode(); //shows iteration process
     VoronoiTreemap treemap = new VoronoiTreemap();
+    // VoronoiCore.setDebugMode(); //shows iteration process
     treemap.setRootPolygon(rootPolygon);
     treemap.setTreeData(data);
     treemap.setCancelOnMaxIteration(true);
@@ -163,6 +156,12 @@ when using the following code (see ``kn.uni.voronoitreemap.interfaces.Sample1.ja
     treemap.setStatusObject(new PDFStatusObject("miniHierarchy", treemap));
     treemap.computeLocked();
 ```
+
+Example linux kernel package hierarchy
+-----
+The folder structure of the linux kernel source (https://github.com/torvalds/linux) with over 50k elements is shown in the following Voronoi treemap visualization:
+![linux kernel package hierarchy](https://github.com/ArlindNocaj/Voronoi-Treemap-Library/raw/master/examples/linux-kernel.png)
+
 
 License
 ------------------------

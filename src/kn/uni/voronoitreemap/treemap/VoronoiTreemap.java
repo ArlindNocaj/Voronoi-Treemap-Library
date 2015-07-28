@@ -211,10 +211,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject {
 		node.setTreemap(this);
 	}
 
-	public static void main(String[] args) {
-		
-		
-		VoronoiTreemap voronoiTreemap = new VoronoiTreemap();				
+	public static void main(String[] args) {									
 
 		//create a convex root polygon
 		PolygonSimple rootPolygon = new PolygonSimple();
@@ -255,8 +252,10 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject {
 		data.addLink("file035","folder3");
 		data.addLink("file036","folder3");
 	
-//		VoronoiCore.setDebugMode();
+		
+		//VoronoiCore.setDebugMode(); //shows iteration process		
 		VoronoiTreemap treemap = new VoronoiTreemap();
+		//set options
 		treemap.setRootPolygon(rootPolygon);
 		treemap.setTreeData(data);
 		treemap.setCancelOnMaxIteration(true);
@@ -266,6 +265,7 @@ public class VoronoiTreemap implements Iterable<VoroNode>, StatusObject {
 		treemap.setUniformWeights(true);
 		treemap.setNumberThreads(1);
 
+		//add statushandler
 		treemap.setStatusObject(new WriteStatusObject("miniHierarchy-result", treemap));
 		treemap.setStatusObject(new PNGStatusObject("miniHierarchy",
 				treemap));

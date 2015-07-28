@@ -49,6 +49,10 @@ public class TreeData {
 		public Point2D.Double relativeCoord;
 	}
 	
+	public void setRoot(String name){
+		if(!nodeNameToId.containsKey(name)) return;
+		rootIndex=nodeNameToId.get(name);
+	}
 	
 	public void setWeight(String name,double weight){
 		if(weight<=0) return;

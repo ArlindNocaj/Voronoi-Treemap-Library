@@ -23,10 +23,11 @@ public class Sample1 {
 			rootPolygon.add(x, y);
 		}
 
-		// create hierarchy structure (first parent will be root element)
+		// create hierarchical structure
 		TreeData data = new TreeData();
-		data.addLink("README.md", "project");
+		data.addLink("README.md", "project");		
 		data.addLink("file001", "project");
+		data.setRoot("project");
 
 		data.addLink("folder1", "project");
 		data.addLink("file011", "folder1");
@@ -48,9 +49,10 @@ public class Sample1 {
 		data.addLink("file034", "folder3");
 		data.addLink("file035", "folder3");
 		data.addLink("file036", "folder3");
+				
 
-		//increases the size of the corresponding cell
-		// data.setWeight("file036", 4); 
+		// increases the size of the corresponding cell
+		// data.setWeight("file036", 4);
 
 		// VoronoiCore.setDebugMode(); //shows iteration process
 		VoronoiTreemap treemap = new VoronoiTreemap();
@@ -63,8 +65,7 @@ public class Sample1 {
 		// treemap.setUniformWeights(true);
 		treemap.setNumberThreads(1);
 
-		treemap.setStatusObject(new WriteStatusObject("miniHierarchy-result",
-				treemap));
+		//add result handler
 		treemap.setStatusObject(new PNGStatusObject("miniHierarchy", treemap));
 		treemap.setStatusObject(new PDFStatusObject("miniHierarchy", treemap));
 		treemap.computeLocked();

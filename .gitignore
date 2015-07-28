@@ -7,3 +7,5 @@ dist
 *.jar
 *.war
 *.ear
+/dataPrivate
+/samples

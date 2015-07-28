@@ -9,3 +9,4 @@ dist
 *.ear
 /dataPrivate
 /samples
+/build

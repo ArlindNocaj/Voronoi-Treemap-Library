@@ -16,7 +16,6 @@ package kn.uni.voronoitreemap.IO;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 
 import kn.uni.voronoitreemap.interfaces.StatusObject;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;

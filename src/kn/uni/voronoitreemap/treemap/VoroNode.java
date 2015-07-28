@@ -15,12 +15,10 @@ package kn.uni.voronoitreemap.treemap;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
-import kn.uni.voronoitreemap.core.VoroSettings;
 import kn.uni.voronoitreemap.core.VoronoiCore;
 import kn.uni.voronoitreemap.extension.VoroCellObject;
 import kn.uni.voronoitreemap.j2d.Point2D;

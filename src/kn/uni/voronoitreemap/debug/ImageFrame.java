@@ -13,23 +13,17 @@
 package kn.uni.voronoitreemap.debug;
 
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import kn.uni.voronoitreemap.core.VoronoiCore;
-import kn.uni.voronoitreemap.datastructure.OpenList;
-import kn.uni.voronoitreemap.debuge.Colors;
-import kn.uni.voronoitreemap.j2d.PolygonSimple;
-import kn.uni.voronoitreemap.j2d.Site;
 
 /**
  * JFrame with a buffered image.

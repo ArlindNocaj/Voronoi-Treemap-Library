@@ -2,7 +2,6 @@ package kn.uni.voronoitreemap.interfaces;
 
 import kn.uni.voronoitreemap.IO.PDFStatusObject;
 import kn.uni.voronoitreemap.IO.PNGStatusObject;
-import kn.uni.voronoitreemap.IO.WriteStatusObject;
 import kn.uni.voronoitreemap.interfaces.data.TreeData;
 import kn.uni.voronoitreemap.j2d.PolygonSimple;
 import kn.uni.voronoitreemap.treemap.VoronoiTreemap;

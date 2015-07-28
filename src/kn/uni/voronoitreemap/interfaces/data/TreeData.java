@@ -50,6 +50,12 @@ public class TreeData {
 	}
 	
 	
+	public void setWeight(String name,double weight){
+		if(weight<=0) return;
+		if(!nodeNameToId.containsKey(name)) return;		
+		nodeAtt.get(nodeNameToId.get(name)).weight=weight;
+	}
+	
 	public void addLink(String childName, String parentName){
 		if(nodeNameToId==null)
 			init();			
